@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* 기획서 컬러 팔레트 — Tailwind v4 테마 토큰 */
+@theme {
+  --color-background: #090909;
+  --color-foreground: #ffffff;
+  --color-muted: #9ca3af;
+  --color-card: #111111;
+  --color-card-hover: #1a1a1a;
+  --color-border-subtle: #222222;
+  --color-accent: #3b82f6;
+  --color-accent-purple: #a855f7;
+
+  --font-sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 커스텀 스크롤바 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #090909;
+}
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 2px;
+}
