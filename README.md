@@ -2,6 +2,8 @@
 
 개인 포트폴리오 웹사이트입니다. 3D 인터랙션과 스크롤 애니메이션을 적용한 싱글 페이지로 구성되어 있습니다.
 
+![Donghyeon Portfolio 미리보기](docs/main.png)
+
 🔗 **Live:** [donghyeon-portfolio.vercel.app](https://donghyeon-portfolio.vercel.app)
 
 ## 구성 섹션
