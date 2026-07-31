@@ -38,6 +38,7 @@ export interface UIDict {
   timeline: {
     present: string;
     ongoing: string;
+    poster: string;
     kinds: { work: string; project: string; award: string };
   };
   downloads: {
@@ -49,8 +50,6 @@ export interface UIDict {
     more: string;
   };
   footer: {
-    contact: string;
-    colophon: string;
     source: string;
   };
 }
@@ -92,6 +91,7 @@ const ko: UIDict = {
   timeline: {
     present: "현재",
     ongoing: "진행 중",
+    poster: "포스터",
     kinds: { work: "연구", project: "개발", award: "수상" },
   },
   downloads: {
@@ -103,8 +103,6 @@ const ko: UIDict = {
     more: "자세히",
   },
   footer: {
-    contact: "연락",
-    colophon: "Pretendard로 조판하고, Next.js로 만들었습니다.",
     source: "소스 보기",
   },
 };
@@ -147,6 +145,7 @@ const en: UIDict = {
   timeline: {
     present: "Now",
     ongoing: "Ongoing",
+    poster: "poster",
     kinds: { work: "Research", project: "Engineering", award: "Award" },
   },
   downloads: {
@@ -158,8 +157,6 @@ const en: UIDict = {
     more: "Details",
   },
   footer: {
-    contact: "Contact",
-    colophon: "Set in Pretendard. Built with Next.js.",
     source: "View source",
   },
 };

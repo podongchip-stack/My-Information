@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Dumbbell, { num } from "@/components/charts/Dumbbell";
 import Reveal from "@/components/ui/Reveal";
 import ModalCard from "@/components/ui/ModalCard";
@@ -84,9 +85,6 @@ function BranchCard({
   lang: Lang;
 }) {
   const work = item.workSlug ? workBySlug.get(item.workSlug) : undefined;
-  const metrics = work?.study?.metrics;
-  const vram = metrics?.find((m) => m.after.includes("MB"));
-
   const isAward = item.kind === "award";
 
   return (
@@ -97,22 +95,35 @@ function BranchCard({
           : "border-accent/35 hover:border-accent/70"
       }`}
     >
-      <p className="flex flex-wrap items-center gap-x-2 text-xs text-faint">
-        <span className="font-mono tabular-nums">{period(item)}</span>
-        {item.ongoing && (
-          <span className="text-accent">{ui.timeline.ongoing}</span>
-        )}
-        {isAward ? (
-          <span className="rounded-sm border border-award/60 px-1.5 py-0.5 text-award">
-            {ui.timeline.kinds.award}
-          </span>
-        ) : (
-          <span>· {ui.timeline.kinds[item.kind]}</span>
-        )}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-x-2 text-xs text-faint">
+            <span className="font-mono tabular-nums">{period(item)}</span>
+            {item.ongoing && (
+              <span className="text-accent">{ui.timeline.ongoing}</span>
+            )}
+            {isAward ? (
+              <span className="rounded-sm border border-award/60 px-1.5 py-0.5 text-award">
+                {ui.timeline.kinds.award}
+              </span>
+            ) : (
+              <span>· {ui.timeline.kinds[item.kind]}</span>
+            )}
+          </p>
 
-      <h3 className="mt-2 text-sm font-semibold">{item.title[lang]}</h3>
-      <p className="mt-0.5 text-xs text-faint">{item.org[lang]}</p>
+          <h3 className="mt-2 text-sm font-semibold">{item.title[lang]}</h3>
+          <p className="mt-0.5 text-xs text-faint">{item.org[lang]}</p>
+        </div>
+
+        {item.image && (
+          <Image
+            src={item.image}
+            alt={`${item.title[lang]} ${ui.timeline.poster}`}
+            sizes="56px"
+            className="w-14 shrink-0 rounded-sm border border-line"
+          />
+        )}
+      </div>
 
       <p className="mt-2 text-sm leading-relaxed text-muted">
         {renderEm(work ? work.summary[lang] : item.detail[lang])}
@@ -141,33 +152,6 @@ function BranchCard({
         </p>
       )}
 
-      {metrics && (
-        <div className="mt-4 border-t border-line pt-3.5">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="text-xs font-medium">{ui.ocr.title}</p>
-            <p className="text-[10px] text-faint">{ui.ocr.note}</p>
-          </div>
-          <div className="mt-3">
-            <Dumbbell metrics={metrics} lang={lang} />
-          </div>
-          {vram && (
-            <p className="mt-2 text-xs">
-              <span className="text-muted">{ui.ocr.vram}</span>{" "}
-              <span className="tabular-nums">
-                <span className="text-faint">{vram.before}</span>
-                <span className="text-faint" aria-hidden>
-                  {" → "}
-                </span>
-                <span className="font-semibold">{vram.after}</span>
-              </span>{" "}
-              <span className="text-accent">
-                −{Math.round((1 - num(vram.after) / num(vram.before!)) * 100)}%
-              </span>
-            </p>
-          )}
-        </div>
-      )}
-
       {/* 카드 전체가 모달을 여는 버튼임을 알리는 힌트 */}
       <p
         className={`mt-3 text-right text-xs ${
@@ -191,6 +175,8 @@ function CardDetail({
   lang: Lang;
 }) {
   const work = item.workSlug ? workBySlug.get(item.workSlug) : undefined;
+  const metrics = work?.study?.metrics;
+  const vram = metrics?.find((m) => m.after.includes("MB"));
   const isAward = item.kind === "award";
 
   return (
@@ -216,6 +202,12 @@ function CardDetail({
         {renderEm(work ? work.summary[lang] : item.detail[lang])}
       </p>
 
+      {work?.study && (
+        <p className="mt-3 text-sm leading-[1.85] text-muted">
+          {renderEm(work.study.lead[lang])}
+        </p>
+      )}
+
       {item.highlights && (
         <ul className="mt-3 space-y-1.5">
           {item.highlights[lang].map((h) => (
@@ -233,6 +225,42 @@ function CardDetail({
             </li>
           ))}
         </ul>
+      )}
+
+      {item.image && (
+        <Image
+          src={item.image}
+          alt={`${item.title[lang]} ${ui.timeline.poster}`}
+          sizes="(min-width: 640px) 28rem, 100vw"
+          className="mt-4 w-full rounded-md border border-line"
+        />
+      )}
+
+      {metrics && (
+        <div className="mt-5 border-t border-line pt-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-xs font-medium">{ui.ocr.title}</p>
+            <p className="text-[10px] text-faint">{ui.ocr.note}</p>
+          </div>
+          <div className="mt-3">
+            <Dumbbell metrics={metrics} lang={lang} />
+          </div>
+          {vram && (
+            <p className="mt-2 text-xs">
+              <span className="text-muted">{ui.ocr.vram}</span>{" "}
+              <span className="tabular-nums">
+                <span className="text-faint">{vram.before}</span>
+                <span className="text-faint" aria-hidden>
+                  {" → "}
+                </span>
+                <span className="font-semibold">{vram.after}</span>
+              </span>{" "}
+              <span className="text-accent">
+                −{Math.round((1 - num(vram.after) / num(vram.before!)) * 100)}%
+              </span>
+            </p>
+          )}
+        </div>
       )}
 
       {work && (

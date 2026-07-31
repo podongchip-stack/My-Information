@@ -1,4 +1,9 @@
+import type { StaticImageData } from "next/image";
 import type { L10n } from "@/lib/i18n";
+// additionaldata/ 파일명 규칙은 additionaldata/type.md 참고 — category_num_type (3=프로젝트, 4=수상, num은 시간순)
+import aiRookiePoster from "@/additionaldata/3_1_image.png";
+import gnuEsgPoster from "@/additionaldata/4_1_image.jpg";
+import busanPoster from "@/additionaldata/4_2_image.jpg";
 
 export type TimelineKind = "work" | "project" | "award";
 
@@ -17,6 +22,8 @@ export interface TimelineItem {
   highlights?: L10n<string[]>;
   /** 있으면 해당 케이스 스터디로 링크된다 */
   workSlug?: string;
+  /** 카드·모달에 함께 보여줄 포스터 이미지 (선택) */
+  image?: StaticImageData;
 }
 
 export const timeline: TimelineItem[] = [
@@ -25,6 +32,7 @@ export const timeline: TimelineItem[] = [
     start: "2026.07",
     ongoing: true,
     kind: "project",
+    image: aiRookiePoster,
     title: {
       ko: "2026 AI ROOKIE 대회 — 골든링크",
       en: "2026 AI ROOKIE — GoldenLink",
@@ -93,7 +101,8 @@ export const timeline: TimelineItem[] = [
   },
   {
     id: "busan-hackathon",
-    start: "2025.09",
+    start: "2025.08",
+    image: busanPoster,
     kind: "award",
     title: {
       ko: "제2회 부산 글로벌허브도시 청년 해커톤",
@@ -107,7 +116,8 @@ export const timeline: TimelineItem[] = [
   },
   {
     id: "gnu-esg",
-    start: "2025.06",
+    start: "2025.07",
+    image: gnuEsgPoster,
     kind: "award",
     title: { ko: "GNU-SDGs / ESG 공모전", en: "GNU-SDGs / ESG Competition" },
     org: { ko: "경상국립대학교", en: "Gyeongsang National University" },

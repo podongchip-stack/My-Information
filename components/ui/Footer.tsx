@@ -7,8 +7,7 @@ export default function Footer({ lang }: { lang: Lang }) {
   const ui = getUI(lang);
 
   return (
-    <footer className="mt-20 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-line pt-6 text-xs text-faint">
-      <p>{ui.footer.colophon}</p>
+    <footer className="mt-20 flex flex-wrap items-baseline justify-end gap-x-6 gap-y-2 border-t border-line pt-6 text-xs text-faint">
       <a
         href={SOURCE_URL}
         target="_blank"
