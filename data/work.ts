@@ -35,7 +35,7 @@ export interface WorkItem {
   team?: number;
   tech: string[];
   links: { label: string; href: string }[];
-  /** 없으면 목록에서 "상세 기록 준비 중"으로 표시되고 상세 페이지도 생성되지 않는다 */
+  /** 상세 기록 — metrics는 타임라인 카드의 전후 차트에 쓰인다 */
   study?: CaseStudy;
 }
 
@@ -202,17 +202,17 @@ export const work: WorkItem[] = [
   {
     slug: "stock-agent",
     title: {
-      ko: "Stock Agent — 앙상블 분석 에이전트",
-      en: "Stock Agent — Ensemble Analysis Agent",
+      ko: "Stock Agent — 주식 분석 에이전트",
+      en: "Stock Agent — Stock Analysis Agents",
     },
     summary: {
-      ko: "LSTM과 LLM의 출력을 앙상블해 분석 보고서를 만들고 매매까지 실행하는 개인 프로젝트.",
-      en: "A solo project that ensembles LSTM and LLM outputs into an analysis report and executes trades.",
+      ko: "FastAPI 추론 서버와 React 콘솔로 만든 주식 에이전트. 뉴스 감성·재무·차트·공시 에이전트가 매일 데이터를 쌓고 모의투자까지 실행합니다.",
+      en: "A FastAPI inference server with a React console — news-sentiment, financials, chart and disclosure agents accumulate data daily and run simulated trading.",
     },
     period: "2025.12",
     ongoing: true,
     kind: "ai",
-    tech: ["Python", "LSTM", "LLM", "JSON"],
+    tech: ["Python", "FastAPI", "React", "Gemini", "DART · KIS API"],
     links: [
       {
         label: "Dataset",
@@ -260,6 +260,3 @@ export const work: WorkItem[] = [
 ];
 
 export const workBySlug = new Map(work.map((w) => [w.slug, w]));
-
-/** 상세 페이지가 생성되는 항목만 */
-export const casedWork = work.filter((w) => w.study);

@@ -13,6 +13,8 @@ export interface TimelineItem {
   title: L10n;
   org: L10n;
   detail: L10n;
+  /** 카드에 불릿으로 표시할 상세 성과·역할 목록 (선택) */
+  highlights?: L10n<string[]>;
   /** 있으면 해당 케이스 스터디로 링크된다 */
   workSlug?: string;
 }
@@ -84,8 +86,8 @@ export const timeline: TimelineItem[] = [
     title: { ko: "Stock Agent", en: "Stock Agent" },
     org: { ko: "개인 프로젝트", en: "Solo project" },
     detail: {
-      ko: "LSTM과 LLM 출력을 앙상블해 분석 보고서를 만들고 매매를 실행합니다.",
-      en: "Ensembles LSTM and LLM outputs into a report, then executes trades.",
+      ko: "FastAPI 추론 서버 + React 콘솔. 뉴스 감성·재무·차트 분석 에이전트가 매일 데이터를 쌓고 모의투자를 실행합니다.",
+      en: "A FastAPI inference server with a React console — sentiment, financials and chart agents accumulate data daily and run simulated trading.",
     },
     workSlug: "stock-agent",
   },
@@ -99,8 +101,8 @@ export const timeline: TimelineItem[] = [
     },
     org: { ko: "부산광역시", en: "Busan Metropolitan City" },
     detail: {
-      ko: "구도심의 늘어나는 공실을 활용한 글로벌 미디어 타운을 제안했습니다.",
-      en: "Proposed a global media town built out of the growing vacancy in Busan's old downtown.",
+      ko: "구도심의 **늘어나는 공실을 활용**한 글로벌 미디어 타운을 제안했습니다.",
+      en: "Proposed a global media town built out of the **growing vacancy** in Busan's old downtown.",
     },
   },
   {
@@ -110,8 +112,8 @@ export const timeline: TimelineItem[] = [
     title: { ko: "GNU-SDGs / ESG 공모전", en: "GNU-SDGs / ESG Competition" },
     org: { ko: "경상국립대학교", en: "Gyeongsang National University" },
     detail: {
-      ko: "유리병 반환 시 현금 대신 포인트를 지급해 참여도를 끌어올리는 방안을 제안했습니다.",
-      en: "Proposed paying points instead of cash for returned glass bottles to lift participation.",
+      ko: "유리병 반환 시 **현금 대신 포인트를 지급해 참여도**를 끌어올리는 방안을 제안했습니다.",
+      en: "Proposed **paying points instead of cash** for returned glass bottles to lift participation.",
     },
   },
 ];

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import "../globals.css";
-import Navbar from "@/components/ui/Navbar";
-import Footer from "@/components/ui/Footer";
 import { HTML_LANG, LANGS, isLang, type Lang } from "@/lib/i18n";
 import { getUI } from "@/lib/content/ui";
 
@@ -72,11 +70,13 @@ export default async function LangLayout({
           as="style"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"
         />
+        {/* JS 없는 환경에서는 스크롤 리빌 요소를 즉시 보이게 한다 */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;translate:none!important}`}</style>
+        </noscript>
       </head>
       <body className="min-h-full bg-background text-foreground">
-        <Navbar lang={typed} />
-        <main>{children}</main>
-        <Footer lang={typed} />
+        {children}
       </body>
     </html>
   );

@@ -1,53 +1,66 @@
 @import "tailwindcss";
 
 /*
- * 팔레트 — 강조색은 시안 하나로 통일한다.
- * 이전 파랑→보라 그라디언트는 3D 씬의 방전 색(#22d3ee)과 어긋나서 걷어냈다.
+ * 팔레트 — 검은 배경 + 네이버 그린.
+ * 그린(#03c75a)이 링크·커밋 점·차트 마크를 모두 담당하는 단일 메인 컬러다.
+ * accent-dim은 같은 색조의 어두운 단계로, 그래프 줄기와 "개선 전" 값에 쓴다.
+ * 본문 대비: foreground 16.9:1, muted 8.1:1, faint 5.9:1, accent 8.8:1 (WCAG AA 이상).
  */
 @theme {
-  --color-background: #07070a;
-  --color-surface: #0d0d12;
-  --color-surface-hover: #14141b;
-  --color-foreground: #f4f4f5;
-  --color-muted: #8b8b96;
-  --color-faint: #5a5a66;
-  --color-line: #1b1b23;
-  --color-line-strong: #2a2a35;
-  --color-accent: #22d3ee;
-  --color-accent-dim: #0e7490;
+  --color-background: #0a0a0a;
+  --color-surface: #121212;
+  --color-surface-hover: #1b1b1b;
+  --color-foreground: #ededed;
+  --color-muted: #a6a6a6;
+  --color-faint: #8c8c8c;
+  --color-line: #232323;
+  --color-line-strong: #3a3a3a;
+  --color-accent: #03c75a;
+  --color-accent-dim: #0e8a44;
+
+  /*
+   * 카테고리 색 — KPI 카드 테두리와 그래프 노드·칩이 같은 색을 공유한다.
+   * 프로젝트=그린(accent), 릴리즈=블루, 수상=골드, 자격증=핑크.
+   * dataviz 검증: 골드↔그린 색각이상 ΔE 7.8(허용 밴드 — 모든 카테고리에
+   * 텍스트 라벨이 함께 붙는 조건), 일반시각·배경 대비는 전부 통과.
+   */
+  --color-release: #3987e5;
+  --color-award: #b8860b;
+  --color-cert: #e87ba4;
 
   --font-sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --font-mono: ui-monospace, "Cascadia Mono", SFMono-Regular, "SF Mono", Menlo,
+    Consolas, monospace;
 }
 
 html {
   scroll-behavior: smooth;
-  /* 고정 네비게이션 높이만큼 앵커 착지점을 내린다 */
-  scroll-padding-top: 5rem;
 }
 
 body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+  /* 한국어 단어 중간 줄바꿈 방지 */
+  word-break: keep-all;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
   background: var(--color-accent);
-  color: #07070a;
+  color: #0a0a0a;
 }
 
-::-webkit-scrollbar {
-  width: 4px;
+/* 모달 등장 — 살짝 아래에서 떠오른다 (reduced-motion이면 전역 규칙이 끔) */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
 }
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-accent-dim);
-  border-radius: 2px;
+@utility modal-in {
+  animation: modal-in 0.2s ease-out;
 }
 
 /* 키보드 포커스만 링을 그린다 (마우스 클릭에는 안 나오도록) */
@@ -55,21 +68,6 @@ body {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
   border-radius: 2px;
-}
-
-/*
- * 섹션 라벨 — "01 / WORK" 형태.
- * 모든 섹션이 같은 그라디언트 밑줄을 쓰던 걸 대체해 위계를 만든다.
- */
-@utility section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-faint);
 }
 
 /* 모션을 줄이라는 설정이면 스크롤 스무딩과 트랜지션을 전부 끈다 */

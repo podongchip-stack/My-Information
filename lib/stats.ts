@@ -8,6 +8,11 @@
 export type Platform = "huggingface" | "kaggle";
 export type ArtifactKind = "dataset" | "model";
 
+export const PLATFORM_LABEL: Record<Platform, string> = {
+  huggingface: "Hugging Face",
+  kaggle: "Kaggle",
+};
+
 export type ArtifactStat = {
   platform: Platform;
   kind: ArtifactKind;
@@ -15,6 +20,8 @@ export type ArtifactStat = {
   title: string;
   url: string;
   downloads: number;
+  /** 공개 시각(ISO). 있으면 타임라인 그래프에 릴리즈로 표시된다 */
+  createdAt?: string;
 };
 
 const HF_USER = "podongchip";
@@ -34,13 +41,14 @@ type HFEntry = {
   id: string;
   downloadsAllTime?: number;
   downloads?: number;
+  createdAt?: string;
 };
 
 async function fetchHuggingFace(kind: ArtifactKind): Promise<ArtifactStat[]> {
   const path = kind === "dataset" ? "datasets" : "models";
   try {
     const res = await fetch(
-      `https://huggingface.co/api/${path}?author=${HF_USER}&expand[]=downloadsAllTime`,
+      `https://huggingface.co/api/${path}?author=${HF_USER}&expand[]=downloadsAllTime&expand[]=createdAt`,
       { next: { revalidate: REVALIDATE_SECONDS } }
     );
     if (!res.ok) return [];
@@ -53,6 +61,7 @@ async function fetchHuggingFace(kind: ArtifactKind): Promise<ArtifactStat[]> {
       title: prettifyId(d.id),
       url: `https://huggingface.co/${kind === "dataset" ? "datasets/" : ""}${d.id}`,
       downloads: d.downloadsAllTime ?? d.downloads ?? 0,
+      createdAt: d.createdAt,
     }));
   } catch {
     return [];
@@ -80,6 +89,7 @@ export async function getKaggleStats(): Promise<ArtifactStat[]> {
       title?: string;
       downloadCount?: number;
       totalDownloads?: number;
+      lastUpdated?: string;
     }> = await res.json();
 
     return data.map((d) => ({
@@ -89,10 +99,19 @@ export async function getKaggleStats(): Promise<ArtifactStat[]> {
       title: d.title || prettifyId(d.ref),
       url: `https://www.kaggle.com/datasets/${d.ref}`,
       downloads: d.downloadCount ?? d.totalDownloads ?? 0,
+      createdAt: d.lastUpdated,
     }));
   } catch {
     return [];
   }
+}
+
+/** ISR 재생성 시각 — 라이브 수치 옆에 기준일로 표기한다 */
+export function asOfDate(): string {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}.${mm}.${dd}`;
 }
 
 export async function getOpenSourceStats(): Promise<{
