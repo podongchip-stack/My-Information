@@ -3,7 +3,9 @@
 개인 포트폴리오 웹사이트입니다. 검은 배경 위에 git 그래프 형태의 타임라인을 세우고,
 글 대신 숫자와 차트로 정보를 전달합니다. 한국어/영어를 지원합니다.
 
-🔗 **Live:** [donghyeon-portfolio.vercel.app](https://donghyeon-portfolio.vercel.app)
+🔗 **Live:** [my-information-mu.vercel.app](https://my-information-mu.vercel.app)
+
+![메인 화면](docs/main.png)
 
 ## 구조
 
@@ -26,7 +28,8 @@
 - **차트** — 전부 서버 렌더링 CSS/HTML입니다 (차트 라이브러리 없음).
   - KPI 타일: 누적 다운로드(Hugging Face·Kaggle 라이브, ISR 1시간) · 자격증 · 프로젝트 · 수상
   - 전후 비교 덤벨: OCR 재현율 68→88% 등 % 지표를 0–100 축 하나에 표시 (단위가 다른 VRAM은 분리)
-  - 릴리즈 노드 미니바: 공개물별 다운로드 수 (HF `createdAt` 기준 배치)
+  - 릴리즈 노드 미니바: 공개물별 다운로드 수 (HF는 `createdAt`, Kaggle은 `lastUpdated` 기준 배치)
+  - 다운로드 모달: 총합 + 플랫폼 분할 바, 공개물별 비례 바
 - **히어로 3D** — 로드 시 3D git 그래프가 아래에서 위로 약 3초간 조용히 "그려진" 뒤
   정지합니다(react-three-fiber). 이후에는 마우스를 따라 살짝 기울기만 하고,
   `prefers-reduced-motion`이면 렌더링하지 않습니다.
@@ -71,7 +74,7 @@ app/
 components/
   charts/            # Dumbbell (전후 비교 덤벨)
   sections/          # Kpis (타일 + 카테고리 모달), GitGraph (그래프 + 카드 모달)
-  ui/                # Hero, HeroScene(3D), ModalCard, Reveal, BrandIcon, Footer, em
+  ui/                # Hero, HeroScene·HeroSceneCanvas(3D), ModalCard, Reveal, BrandIcon, Footer, em
 data/
   work.ts            # 작업 목록 (+ metrics — 카드 차트 데이터)
   timeline.ts        # 경력·수상 타임라인 (git 그래프의 데이터원)
