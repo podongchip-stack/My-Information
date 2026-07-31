@@ -1,85 +1,61 @@
-import ScrollReveal from "@/components/ui/ScrollReveal";
+import Section from "@/components/ui/Section";
+import Reveal from "@/components/ui/Reveal";
 import LottieGreeting from "@/components/ui/LottieGreeting";
+import { getUI } from "@/lib/content/ui";
+import type { Lang } from "@/lib/i18n";
 
-const CONTACT = {
-  email: "podongchip@gmail.com",
-  github: "https://github.com/podongchip-stack", 
-  Kaggle: "https://www.kaggle.com/podongchip",
-  HuggingFace: "https://huggingface.co/podongchip",
-  YouTube: "https://www.youtube.com/@포테이송"
-};
+const EMAIL = "podongchip@gmail.com";
 
-export default function Contact() {
+const SOCIALS = [
+  { label: "GitHub", href: "https://github.com/podongchip-stack" },
+  { label: "Hugging Face", href: "https://huggingface.co/podongchip" },
+  { label: "Kaggle", href: "https://www.kaggle.com/podongchip" },
+  { label: "YouTube", href: "https://www.youtube.com/@포테이송" },
+];
+
+export default function Contact({ lang }: { lang: Lang }) {
+  const ui = getUI(lang);
+
   return (
-    <section id="contact" className="mx-auto max-w-5xl px-6 py-28">
-      <ScrollReveal className="text-center">
-        <h2 className="mb-3 text-3xl font-bold tracking-tight sm:text-4xl">
-          Contact
-        </h2>
-        <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-gradient-to-r from-accent to-accent-purple" />
-
-        <p className="mb-10 text-muted">
-          협업이나 문의는 언제든 환영합니다.
-        </p>
-
+    <Section
+      id="contact"
+      index="05"
+      label={ui.contact.label}
+      title={ui.contact.title}
+      lead={ui.contact.lead}
+    >
+      <Reveal>
         <a
-          href={`mailto:${CONTACT.email}`}
-          className="inline-block rounded-full bg-accent px-8 py-4 text-sm font-semibold text-white transition-colors hover:bg-accent/90"
+          href={`mailto:${EMAIL}`}
+          className="inline-block text-2xl font-semibold tracking-tight break-all text-accent transition-opacity hover:opacity-80 sm:text-4xl"
         >
-          {CONTACT.email}
+          {EMAIL}
         </a>
+      </Reveal>
 
-        <div className="mt-8 flex justify-center gap-6 text-sm text-muted">
-          {CONTACT.github && (
-            <a
-              href={CONTACT.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-foreground"
-            >
-              GitHub
-            </a>
-          )}
-          {CONTACT.Kaggle && (
-            <a
-              href={CONTACT.Kaggle}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-foreground"
-            >
-              Kaggle
-            </a>
-          )}
-          {CONTACT.HuggingFace && (
-            <a
-              href={CONTACT.HuggingFace}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-foreground"
-            >
-              Hugging Face
-            </a>
-          )}
-          {CONTACT.YouTube && (
-            <a
-              href={CONTACT.YouTube}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-foreground"
-            >
-              YouTube
-            </a>
-          )}
-          
-        </div>
+      <Reveal delay={0.08}>
+        <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 border-t border-line pt-8 text-sm">
+          {SOCIALS.map((s) => (
+            <li key={s.href}>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted transition-colors hover:text-foreground"
+              >
+                {s.label} ↗
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
-        <div className="mt-28 flex flex-col items-center gap-3">
-          <LottieGreeting />
-          <p className="text-base font-semibold text-foreground sm:text-lg">
-            끝까지 봐주셔서 감사합니다!
-          </p>
+      <Reveal delay={0.14}>
+        <div className="mt-24 flex flex-col items-center gap-3">
+          <LottieGreeting label={ui.contact.greetingAlt} />
+          <p className="text-base font-medium">{ui.contact.thanks}</p>
         </div>
-      </ScrollReveal>
-    </section>
+      </Reveal>
+    </Section>
   );
 }

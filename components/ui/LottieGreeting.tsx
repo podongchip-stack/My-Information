@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useReducedMotion } from "framer-motion";
 
 // lottie-react는 브라우저(DOM) 전용 → SSR 비활성화
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
-export default function LottieGreeting() {
+export default function LottieGreeting({ label }: { label: string }) {
   const [data, setData] = useState<object | null>(null);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     let active = true;
@@ -27,10 +29,10 @@ export default function LottieGreeting() {
   return (
     <Lottie
       animationData={data}
-      loop
-      autoplay
+      loop={!reduced}
+      autoplay={!reduced}
       className="w-44 sm:w-52"
-      aria-label="인사하는 귀여운 고양이 캐릭터"
+      aria-label={label}
     />
   );
 }

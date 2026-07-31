@@ -1,21 +1,29 @@
 @import "tailwindcss";
 
-/* 기획서 컬러 팔레트 — Tailwind v4 테마 토큰 */
+/*
+ * 팔레트 — 강조색은 시안 하나로 통일한다.
+ * 이전 파랑→보라 그라디언트는 3D 씬의 방전 색(#22d3ee)과 어긋나서 걷어냈다.
+ */
 @theme {
-  --color-background: #090909;
-  --color-foreground: #ffffff;
-  --color-muted: #9ca3af;
-  --color-card: #111111;
-  --color-card-hover: #1a1a1a;
-  --color-border-subtle: #222222;
-  --color-accent: #3b82f6;
-  --color-accent-purple: #a855f7;
+  --color-background: #07070a;
+  --color-surface: #0d0d12;
+  --color-surface-hover: #14141b;
+  --color-foreground: #f4f4f5;
+  --color-muted: #8b8b96;
+  --color-faint: #5a5a66;
+  --color-line: #1b1b23;
+  --color-line-strong: #2a2a35;
+  --color-accent: #22d3ee;
+  --color-accent-dim: #0e7490;
 
   --font-sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 
 html {
   scroll-behavior: smooth;
+  /* 고정 네비게이션 높이만큼 앵커 착지점을 내린다 */
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -23,16 +31,57 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* 커스텀 스크롤바 */
+::selection {
+  background: var(--color-accent);
+  color: #07070a;
+}
+
 ::-webkit-scrollbar {
   width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #090909;
+  background: var(--color-background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #3b82f6;
+  background: var(--color-accent-dim);
   border-radius: 2px;
+}
+
+/* 키보드 포커스만 링을 그린다 (마우스 클릭에는 안 나오도록) */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/*
+ * 섹션 라벨 — "01 / WORK" 형태.
+ * 모든 섹션이 같은 그라디언트 밑줄을 쓰던 걸 대체해 위계를 만든다.
+ */
+@utility section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+/* 모션을 줄이라는 설정이면 스크롤 스무딩과 트랜지션을 전부 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
