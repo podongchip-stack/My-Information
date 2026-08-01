@@ -15,6 +15,7 @@ export interface UIDict {
     name: string;
     role: string;
     affiliation: string;
+    lab: string;
     claim: string;
     switchLang: string;
   };
@@ -66,7 +67,8 @@ const ko: UIDict = {
   hero: {
     name: "KIM DONG HYEON",
     role: "백엔드 · AI 엔지니어",
-    affiliation: "경상국립대학교 전자공학부 · BNIT EDCL LAB",
+    affiliation: "경상국립대학교 전자공학부",
+    lab: "BNIT EDCL LAB",
     claim:
       "전자공학을 기반으로 백엔드와 AI를 오가며, 모든 결과를 측정 가능한 숫자로 남기는 개발자입니다.",
     switchLang: "English로 보기",
@@ -120,7 +122,8 @@ const en: UIDict = {
     name: "KIM DONG HYEON",
     role: "Backend · AI Engineer",
     affiliation:
-      "Dept. of Electronic Engineering, Gyeongsang National University · BNIT EDCL LAB",
+      "Dept. of Electronic Engineering, Gyeongsang National University",
+    lab: "BNIT EDCL LAB",
     claim:
       "An engineer grounded in electronics, moving between backend and AI — leaving every result as a measurable number.",
     switchLang: "한국어로 보기",

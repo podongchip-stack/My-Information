@@ -5,6 +5,7 @@ import { LANGS, LANG_LABEL, type Lang } from "@/lib/i18n";
 import { getUI } from "@/lib/content/ui";
 
 const EMAIL = "podongchip@gmail.com";
+const LAB_URL = "https://edcl-page.vercel.app/";
 
 const SOCIALS: { label: string; href: string; icon: BrandName }[] = [
   { label: "GitHub", href: "https://github.com/podongchip-stack", icon: "github" },
@@ -57,7 +58,19 @@ export default function Hero({ lang }: { lang: Lang }) {
             </span>
           ))}
         </p>
-        <p className="mt-2 text-sm text-faint">{ui.hero.affiliation}</p>
+        <p className="mt-2 text-sm text-faint">
+          {ui.hero.affiliation}
+          <span aria-hidden> · </span>
+          <a
+            href={LAB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-line-strong underline-offset-4 transition-colors hover:text-foreground hover:decoration-accent"
+          >
+            {ui.hero.lab}
+            <span aria-hidden> ↗</span>
+          </a>
+        </p>
 
         <p className="mt-6 max-w-md text-sm leading-relaxed text-balance text-muted">
           {ui.hero.claim}
