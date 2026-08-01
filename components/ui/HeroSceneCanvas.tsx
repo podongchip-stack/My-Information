@@ -131,7 +131,7 @@ const ndc = new THREE.Vector2();
 const hitPoint = new THREE.Vector3();
 const fieldPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -BASE_Y);
 
-function ContributionField() {
+function ContributionField({ animate }: { animate: boolean }) {
   const state = getState();
   const mesh = useRef<THREE.InstancedMesh>(null);
   const camera = useThree((s) => s.camera);
@@ -141,7 +141,9 @@ function ContributionField() {
 
   // 클릭 → 필드 평면에 투영해 그 지점에서 파동을 일으킨다.
   // 캔버스는 pointer-events-none이라 window에서 받되 캔버스 영역만 반응.
+  // 모션 축소 설정이면 파동도 만들지 않는다.
   useEffect(() => {
+    if (!animate) return;
     const onDown = (e: PointerEvent) => {
       if (e.button !== 0) return;
       const rect = gl.domElement.getBoundingClientRect();
@@ -164,12 +166,14 @@ function ContributionField() {
     };
     window.addEventListener("pointerdown", onDown, { passive: true });
     return () => window.removeEventListener("pointerdown", onDown);
-  }, [camera, gl]);
+  }, [animate, camera, gl]);
 
   useFrame((_, rawDelta) => {
     const s = getState();
     const m = mesh.current;
     if (!m) return;
+    // 모션 축소: 등장 연출을 건너뛰고 완성된 형상으로 바로 간다
+    if (!animate) s.settled = true;
     if (s.settled && s.waves.length === 0 && hydrated.current) return;
     s.time += Math.min(rawDelta, 0.05);
     s.waves = s.waves.filter((w) => s.time - w.t0 < WAVE_LIFE);
@@ -219,7 +223,11 @@ function ContributionField() {
   );
 }
 
-export default function HeroSceneCanvas() {
+export default function HeroSceneCanvas({
+  animate = true,
+}: {
+  animate?: boolean;
+}) {
   return (
     <Canvas
       className="h-full w-full"
@@ -230,7 +238,7 @@ export default function HeroSceneCanvas() {
     >
       <ambientLight intensity={0.45} />
       <directionalLight position={[4, 9, 5]} intensity={1.2} />
-      <ContributionField />
+      <ContributionField animate={animate} />
     </Canvas>
   );
 }

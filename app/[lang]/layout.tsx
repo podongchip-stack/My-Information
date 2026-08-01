@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 import { HTML_LANG, LANGS, isLang, type Lang } from "@/lib/i18n";
 import { getUI } from "@/lib/content/ui";
 
-const SITE_URL = "https://donghyeon-portfolio.vercel.app";
+const SITE_URL = "https://my-information-mu.vercel.app";
 
 // ko/en 외의 세그먼트는 렌더링 자체를 막는다. 레이아웃 안에서 notFound()를
 // 부르면 not-found 경계를 찾을 곳이 없으므로, 라우팅 단계에서 걸러내는 편이 안전하다.
@@ -77,6 +78,7 @@ export default async function LangLayout({
       </head>
       <body className="min-h-full bg-background text-foreground">
         {children}
+        <Analytics />
       </body>
     </html>
   );

@@ -122,7 +122,7 @@ const en: UIDict = {
     affiliation:
       "Dept. of Electronic Engineering, Gyeongsang National University · BNIT EDCL LAB",
     claim:
-      "An engineer moving across electronics, backend and AI — leaving every result as a measurable number.",
+      "An engineer grounded in electronics, moving between backend and AI — leaving every result as a measurable number.",
     switchLang: "한국어로 보기",
   },
   kpi: {
@@ -134,7 +134,7 @@ const en: UIDict = {
     projects: "Projects",
     projectsNote: (ongoing) => `${ongoing} ongoing`,
     awards: "Awards",
-    awardsNote: "Hackathon · competition",
+    awardsNote: "Hackathons · competitions",
   },
   ocr: {
     title: "Before & after",

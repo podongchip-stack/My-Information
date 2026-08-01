@@ -31,11 +31,33 @@ export default function ModalCard({
 }) {
   const [open, setOpen] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
+    // 닫힐 때 포커스를 모달을 연 요소로 되돌린다
+    const opener = document.activeElement as HTMLElement | null;
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      // Tab 포커스를 모달 안에 가둔다
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const focusables = panelRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !panelRef.current.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     // 모달이 떠 있는 동안 뒤 배경 스크롤을 잠근다
@@ -44,6 +66,7 @@ export default function ModalCard({
     return () => {
       document.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = "";
+      opener?.focus?.();
     };
   }, [open]);
 
@@ -87,6 +110,7 @@ export default function ModalCard({
               aria-hidden
             />
             <div
+              ref={panelRef}
               className={`modal-in relative max-h-[85svh] w-full max-w-lg overflow-y-auto rounded-lg border bg-surface p-6 ${panelClassName}`}
             >
               <button
