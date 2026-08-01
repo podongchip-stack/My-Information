@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
-/** 결정적 의사난수 — 매 로드마다 같은 그래프가 나온다 */
+/** 결정적 의사난수 — 매 로드마다 같은 필드가 나온다 */
 function mulberry32(seed: number) {
   let a = seed;
   return () => {
@@ -18,246 +18,203 @@ function mulberry32(seed: number) {
 
 const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 
+const COLS = 96; // 가로 = 시간축 — 32:9 초광폭에서도 화면 양끝을 넘도록 넓게
+const ROWS = 12; // 세로 = 깊이
+const GAP = 0.56;
+const SIZE = 0.44;
+const RISE = 0.5; // 큐브 하나가 솟아오르는 데 걸리는 시간(초)
+const BASE_Y = -4.7; // 필드 바닥의 월드 y — 클릭 파동 평면과 공유
+
+// 클릭 파동 — 크레스트 뒤에 얕은 골이 따라오는 감쇠 링
+const WAVE_SPEED = 5.5; // 링이 퍼지는 속도(유닛/초)
+const WAVE_SIGMA = 0.9; // 링 두께
+const WAVE_FREQ = 1.8; // 크레스트·골 진동수
+const WAVE_AMP = 1.6; // 최대 높이 변화
+const WAVE_DAMP = 0.8; // 시간 감쇠
+const WAVE_LIFE = 3.5; // 이 시간이 지나면 파동 제거(초)
+
+/** 잔디 레벨 팔레트 — 어두운 바닥부터 accent까지 그린 단계 */
+const LEVEL_COLORS = [0x143a24, 0x0e5f33, 0x0e8a44, 0x03c75a, 0x45e08a];
+const LEVEL_HEIGHTS = [0.05, 0.35, 0.7, 1.1, 1.6];
+
 /**
- * 3D git 그래프 — 세로 main 줄기에서 브랜치가 갈라졌다 머지되는 형상.
- * 각 노드·엣지에 등장 시각(t0)을 부여해, 로드 후 약 3초 동안
- * 아래에서 위로 "그려진" 뒤 정지한다.
+ * GitHub 컨트리뷰션 잔디를 3D 바 필드로 —
+ * 열(시간축)별 활동량에 셀 노이즈를 섞고 이웃 평활화로
+ * 실제 잔디처럼 연속된 스트릭·공백 클러스터를 만든다.
  */
-function buildGraph() {
+function buildField() {
   const rnd = mulberry32(20260801);
-  const nodes: number[] = [];
-  const nodeT0: number[] = [];
-  const edges: { a: number; b: number }[] = [];
-  const trunkIdx: number[] = [];
-  let idx = 0;
+  const count = COLS * ROWS;
 
-  const TRUNK = 14;
-  for (let i = 0; i < TRUNK; i++) {
-    const y = -6.5 + (13 * i) / (TRUNK - 1);
-    nodes.push((rnd() - 0.5) * 0.6, y, (rnd() - 0.5) * 0.6);
-    nodeT0.push(0.15 + i * 0.13);
-    trunkIdx.push(idx++);
-    if (i > 0) edges.push({ a: trunkIdx[i - 1], b: trunkIdx[i] });
-  }
+  const colAct = new Float32Array(COLS);
+  for (let c = 0; c < COLS; c++) colAct[c] = rnd();
 
-  for (let b = 0; b < 8; b++) {
-    const startT = 1 + Math.floor(rnd() * (TRUNK - 4));
-    const dir = b % 2 === 0 ? 1 : -1;
-    const len = 3 + Math.floor(rnd() * 4);
-    const reach = 2.2 + rnd() * 2;
-    const zBase = (rnd() - 0.5) * 4;
-    let prev = trunkIdx[startT];
-    const baseY = nodes[trunkIdx[startT] * 3 + 1];
-    const baseT = nodeT0[trunkIdx[startT]] + 0.3;
-    let last = prev;
+  const raw = new Float32Array(count);
+  for (let c = 0; c < COLS; c++)
+    for (let r = 0; r < ROWS; r++)
+      raw[c * ROWS + r] = 0.55 * colAct[c] + 0.45 * rnd();
 
-    for (let j = 1; j <= len; j++) {
-      const t = j / len;
-      nodes.push(
-        dir * Math.sin(t * Math.PI * 0.65) * reach,
-        baseY + t * (1.6 + rnd() * 1.6),
-        zBase * t + (rnd() - 0.5) * 0.5
-      );
-      nodeT0.push(baseT + j * 0.16);
-      last = idx++;
-      edges.push({ a: prev, b: last });
-      prev = last;
-    }
-
-    // 일부 브랜치는 위쪽 main으로 머지
-    if (rnd() < 0.65) {
-      const mergeT = Math.min(TRUNK - 1, startT + 2 + Math.floor(rnd() * 3));
-      edges.push({ a: last, b: trunkIdx[mergeT] });
+  // 4방향 이웃 평활화 — 고립된 튐 없이 덩어리진 패턴
+  const val = new Float32Array(count);
+  for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < ROWS; r++) {
+      let sum = raw[c * ROWS + r] * 0.5;
+      let w = 0.5;
+      const near: [number, number][] = [
+        [c - 1, r],
+        [c + 1, r],
+        [c, r - 1],
+        [c, r + 1],
+      ];
+      for (const [nc, nr] of near) {
+        if (nc >= 0 && nc < COLS && nr >= 0 && nr < ROWS) {
+          sum += raw[nc * ROWS + nr] * 0.125;
+          w += 0.125;
+        }
+      }
+      val[c * ROWS + r] = sum / w;
     }
   }
 
-  const count = nodes.length / 3;
-  const positions = new Float32Array(nodes);
+  const x = new Float32Array(count);
+  const z = new Float32Array(count);
+  const heights = new Float32Array(count);
+  const t0 = new Float32Array(count);
+  const colors = new Float32Array(count * 3);
+  const color = new THREE.Color();
 
-  // 노드 최종 색 — 그린 두 단계를 섞어 깊이감을 준다
-  const bright = new THREE.Color("#03c75a");
-  const dim = new THREE.Color("#0e8a44");
-  const baseColors = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const c = rnd() < 0.4 ? bright : dim;
-    baseColors.set([c.r, c.g, c.b], i * 3);
+  let maxT = 0;
+  for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < ROWS; r++) {
+      const i = c * ROWS + r;
+      const v = val[i];
+      const lv = v < 0.42 ? 0 : v < 0.55 ? 1 : v < 0.68 ? 2 : v < 0.8 ? 3 : 4;
+      heights[i] = LEVEL_HEIGHTS[lv];
+      x[i] = (c - (COLS - 1) / 2) * GAP;
+      z[i] = (r - (ROWS - 1) / 2) * GAP;
+      // 깊이 페이드는 fog 대신 행별로 색에 굽는다 — 거리 기반 fog는
+      // 좌우 끝(카메라에서 멂)까지 지워서 와이드 화면에서 밴드가 끊겨 보인다
+      const fade = 0.35 + 0.65 * (r / (ROWS - 1));
+      color.setHex(LEVEL_COLORS[lv]).multiplyScalar(fade);
+      colors.set([color.r, color.g, color.b], i * 3);
+      // 시간축(왼→오)으로 스윕하며 셀마다 살짝 어긋나게 솟는다
+      t0[i] = 0.1 + (c / (COLS - 1)) * 1.7 + rnd() * 0.3;
+      if (t0[i] > maxT) maxT = t0[i];
+    }
   }
 
-  // 엣지 시작·끝 시각 — 출발 노드에서 자라나 도착 노드 등장에 맞춰 닿는다
-  const edgeT = edges.map((e) => {
-    const start = nodeT0[e.a];
-    const end = Math.max(nodeT0[e.b], start + 0.12);
-    return { start, end };
-  });
-
-  const maxT =
-    Math.max(...nodeT0, ...edgeT.map((t) => t.end)) + 0.4;
-
-  return {
-    count,
-    positions,
-    baseColors,
-    nodeT0: Float32Array.from(nodeT0),
-    edges,
-    edgeT,
-    maxT,
-  };
-}
-
-/** 노드를 동그랗게 찍기 위한 원형 텍스처 */
-function makeCircleTexture(): THREE.CanvasTexture {
-  const size = 64;
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  const c = size / 2;
-  const grad = ctx.createRadialGradient(c, c, 0, c, c, c);
-  grad.addColorStop(0, "rgba(255,255,255,1)");
-  grad.addColorStop(0.6, "rgba(255,255,255,0.9)");
-  grad.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-  return new THREE.CanvasTexture(canvas);
+  return { count, x, z, heights, t0, colors, maxT: maxT + RISE + 0.2 };
 }
 
 /**
- * 프레임마다 제자리 갱신되는 버퍼 — React가 관리할 상태가 아니라
- * WebGL 리소스이므로 모듈 캐시에 두고 React 바깥에서 관리한다.
+ * 애니메이션 진행 상태 — WebGL 리소스와 마찬가지로 React 상태가 아니라
+ * 모듈 캐시에 둔다. 언어 전환으로 리마운트돼도 연출이 재생되지 않는다(의도).
  */
 type FxState = {
-  graph: ReturnType<typeof buildGraph>;
-  colors: Float32Array;
-  linePositions: Float32Array;
-  texture: THREE.CanvasTexture;
+  field: ReturnType<typeof buildField>;
   time: number;
   settled: boolean;
+  waves: { x: number; z: number; t0: number }[];
 };
 
 let cached: FxState | null = null;
 
 function getState(): FxState {
   if (cached) return cached;
-  const graph = buildGraph();
-  cached = {
-    graph,
-    colors: new Float32Array(graph.count * 3),
-    linePositions: new Float32Array(graph.edges.length * 6),
-    texture: makeCircleTexture(),
-    time: 0,
-    settled: false,
-  };
+  cached = { field: buildField(), time: 0, settled: false, waves: [] };
   return cached;
 }
 
-function GitGraph3D() {
-  const state = getState();
-  const tilt = useRef<THREE.Group>(null);
-  const colAttr = useRef<THREE.BufferAttribute>(null);
-  const lineAttr = useRef<THREE.BufferAttribute>(null);
-  const pointer = useRef({ x: 0, y: 0 });
+const dummy = new THREE.Object3D();
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const hitPoint = new THREE.Vector3();
+const fieldPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -BASE_Y);
 
+function ContributionField() {
+  const state = getState();
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const camera = useThree((s) => s.camera);
+  const gl = useThree((s) => s.gl);
+  // 리마운트 시 settled 상태여도 최종 형상을 한 번은 버퍼에 써야 한다
+  const hydrated = useRef(false);
+
+  // 클릭 → 필드 평면에 투영해 그 지점에서 파동을 일으킨다.
+  // 캔버스는 pointer-events-none이라 window에서 받되 캔버스 영역만 반응.
   useEffect(() => {
-    const onMove = (e: globalThis.MouseEvent) => {
-      pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      pointer.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      const rect = gl.domElement.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      )
+        return;
+      ndc.set(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+      raycaster.setFromCamera(ndc, camera);
+      if (!raycaster.ray.intersectPlane(fieldPlane, hitPoint)) return;
+      const s = getState();
+      s.waves.push({ x: hitPoint.x, z: hitPoint.z, t0: s.time });
+      if (s.waves.length > 4) s.waves.shift();
     };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  }, []);
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    return () => window.removeEventListener("pointerdown", onDown);
+  }, [camera, gl]);
 
   useFrame((_, rawDelta) => {
     const s = getState();
-    const dt = Math.min(rawDelta, 0.05);
+    const m = mesh.current;
+    if (!m) return;
+    if (s.settled && s.waves.length === 0 && hydrated.current) return;
+    s.time += Math.min(rawDelta, 0.05);
+    s.waves = s.waves.filter((w) => s.time - w.t0 < WAVE_LIFE);
 
-    // 마우스를 따라 아주 살짝 기운다 — 유일한 상시 모션
-    if (tilt.current) {
-      const k = Math.min(1, dt * 2.5);
-      tilt.current.rotation.x +=
-        (pointer.current.y * 0.14 - tilt.current.rotation.x) * k;
-      tilt.current.rotation.y +=
-        (pointer.current.x * 0.18 - tilt.current.rotation.y) * k;
+    const f = s.field;
+    for (let i = 0; i < f.count; i++) {
+      const p = s.settled ? 1 : clamp01((s.time - f.t0[i]) / RISE);
+      const e = 1 - (1 - p) ** 3;
+      let h = f.heights[i] * e;
+      for (const w of s.waves) {
+        const t = s.time - w.t0;
+        const dx = f.x[i] - w.x;
+        const dz = f.z[i] - w.z;
+        const d = Math.sqrt(dx * dx + dz * dz);
+        const rel = d - WAVE_SPEED * t;
+        h +=
+          WAVE_AMP *
+          Math.cos(rel * WAVE_FREQ) *
+          Math.exp(-(rel * rel) / (2 * WAVE_SIGMA * WAVE_SIGMA)) *
+          Math.exp(-0.05 * d) *
+          Math.exp(-WAVE_DAMP * t);
+      }
+      h = Math.max(h, 0.02);
+      dummy.position.set(f.x[i], h / 2, f.z[i]);
+      dummy.scale.set(SIZE, h, SIZE);
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
     }
+    m.instanceMatrix.needsUpdate = true;
 
-    // 그리기 연출은 완성되면 더 이상 버퍼를 만지지 않는다
-    if (s.settled) return;
-    s.time += dt;
-    const now = s.time;
-    const g = s.graph;
-
-    for (let i = 0; i < g.count; i++) {
-      const a = clamp01((now - g.nodeT0[i]) / 0.35);
-      s.colors[i * 3] = g.baseColors[i * 3] * a;
-      s.colors[i * 3 + 1] = g.baseColors[i * 3 + 1] * a;
-      s.colors[i * 3 + 2] = g.baseColors[i * 3 + 2] * a;
-    }
-
-    for (let e = 0; e < g.edges.length; e++) {
-      const { a, b } = g.edges[e];
-      const { start, end } = g.edgeT[e];
-      const p = clamp01((now - start) / (end - start));
-      const o = e * 6;
-      const a3 = a * 3;
-      const b3 = b * 3;
-      s.linePositions[o] = g.positions[a3];
-      s.linePositions[o + 1] = g.positions[a3 + 1];
-      s.linePositions[o + 2] = g.positions[a3 + 2];
-      s.linePositions[o + 3] =
-        g.positions[a3] + (g.positions[b3] - g.positions[a3]) * p;
-      s.linePositions[o + 4] =
-        g.positions[a3 + 1] + (g.positions[b3 + 1] - g.positions[a3 + 1]) * p;
-      s.linePositions[o + 5] =
-        g.positions[a3 + 2] + (g.positions[b3 + 2] - g.positions[a3 + 2]) * p;
-    }
-
-    if (colAttr.current) colAttr.current.needsUpdate = true;
-    if (lineAttr.current) lineAttr.current.needsUpdate = true;
-    if (now >= g.maxT) s.settled = true;
+    if (!s.settled && s.time >= f.maxT) s.settled = true;
+    if (s.settled) hydrated.current = true;
   });
 
   return (
-    <group ref={tilt}>
-      <group scale={0.92}>
-        <points>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              args={[state.graph.positions, 3]}
-            />
-            <bufferAttribute
-              ref={colAttr}
-              attach="attributes-color"
-              args={[state.colors, 3]}
-            />
-          </bufferGeometry>
-          <pointsMaterial
-            size={0.16}
-            map={state.texture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.85}
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </points>
-
-        <lineSegments>
-          <bufferGeometry>
-            <bufferAttribute
-              ref={lineAttr}
-              attach="attributes-position"
-              args={[state.linePositions, 3]}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial
-            color="#0e8a44"
-            transparent
-            opacity={0.35}
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </lineSegments>
-      </group>
+    <group position={[0, BASE_Y, 0]}>
+      <instancedMesh ref={mesh} args={[undefined, undefined, state.field.count]}>
+        {/* 인스턴스 색은 정적 — setColorAt은 첫 컴파일과 경합하므로 선언적으로 붙인다 */}
+        <instancedBufferAttribute
+          attach="instanceColor"
+          args={[state.field.colors, 3]}
+        />
+        <boxGeometry args={[1, 1, 1]} />
+        <meshLambertMaterial toneMapped={false} />
+      </instancedMesh>
     </group>
   );
 }
@@ -266,11 +223,14 @@ export default function HeroSceneCanvas() {
   return (
     <Canvas
       className="h-full w-full"
-      camera={{ position: [0, 0.4, 10.5], fov: 55 }}
+      camera={{ position: [0, 1.6, 11], fov: 50 }}
+      onCreated={({ camera }) => camera.lookAt(0, -2.6, 0)}
       dpr={[1, 1.5]}
-      gl={{ antialias: false, powerPreference: "high-performance" }}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
     >
-      <GitGraph3D />
+      <ambientLight intensity={0.45} />
+      <directionalLight position={[4, 9, 5]} intensity={1.2} />
+      <ContributionField />
     </Canvas>
   );
 }

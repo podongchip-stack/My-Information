@@ -37,7 +37,7 @@ export default function Hero({ lang }: { lang: Lang }) {
       <Link
         href={`/${other}`}
         aria-label={ui.hero.switchLang}
-        className="absolute top-6 right-0 z-10 inline-flex items-center gap-1.5 rounded-md border border-line-strong px-2.5 py-1.5 font-mono text-xs text-faint transition-colors hover:border-accent hover:text-foreground"
+        className="absolute top-6 right-6 z-10 inline-flex items-center gap-1.5 rounded-md border border-line-strong px-2.5 py-1.5 font-mono text-xs text-faint transition-colors hover:border-accent hover:text-foreground"
       >
         <span className="text-foreground">{LANG_LABEL[lang]}</span>
         <span aria-hidden>/</span>

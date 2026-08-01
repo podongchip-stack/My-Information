@@ -14,15 +14,18 @@ export default async function Home({
   if (!isLang(lang)) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl px-6 pb-10">
+    <>
+      {/* 히어로는 배경 3D가 화면 전폭을 쓰도록 컨테이너 밖 풀블리드 */}
       <Hero lang={lang} />
-      <main className="pt-14">
-        <Kpis lang={lang} />
-        <div className="mt-14">
-          <GitGraph lang={lang} />
-        </div>
-      </main>
-      <Footer lang={lang} />
-    </div>
+      <div className="mx-auto max-w-4xl px-6 pb-10">
+        <main className="pt-14">
+          <Kpis lang={lang} />
+          <div className="mt-14">
+            <GitGraph lang={lang} />
+          </div>
+        </main>
+        <Footer lang={lang} />
+      </div>
+    </>
   );
 }
