@@ -1,7 +1,8 @@
 import type { StaticImageData } from "next/image";
 import type { L10n } from "@/lib/i18n";
 // additionaldata/ 파일명 규칙은 additionaldata/type.md 참고 — category_num_type (3=프로젝트, 4=수상, num은 시간순)
-import aiRookiePoster from "@/additionaldata/3_1_image.png";
+import labHero from "@/additionaldata/3_1_image.svg";
+import aiRookiePoster from "@/additionaldata/3_2_image.png";
 import gnuEsgPoster from "@/additionaldata/4_1_image.jpg";
 import busanPoster from "@/additionaldata/4_2_image.jpg";
 
@@ -22,8 +23,10 @@ export interface TimelineItem {
   highlights?: L10n<string[]>;
   /** 있으면 해당 케이스 스터디로 링크된다 */
   workSlug?: string;
-  /** 카드·모달에 함께 보여줄 포스터 이미지 (선택) */
+  /** 카드·모달에 함께 보여줄 이미지 (선택) */
   image?: StaticImageData;
+  /** poster(기본)는 모달에서 전체 너비, graphic은 본문 폭보다 작게 들어간다 */
+  imageKind?: "poster" | "graphic";
 }
 
 export const timeline: TimelineItem[] = [
@@ -49,6 +52,8 @@ export const timeline: TimelineItem[] = [
     start: "2026.04",
     ongoing: true,
     kind: "project",
+    image: labHero,
+    imageKind: "graphic",
     title: { ko: "연구실 웹사이트 개발 · 운영", en: "Lab website" },
     org: { ko: "EDCL Lab", en: "EDCL Lab" },
     detail: {

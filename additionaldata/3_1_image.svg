@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 34 654 502" role="img">
+  <title>EDCL Lab — Battery Management System</title>
+  <defs>
+    <linearGradient id="shell" x1="380" y1="120" x2="380" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="charge" x1="296" y1="0" x2="464" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="380" cy="280" r="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bloom" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+
+  <style>
+    .chip { fill: #0f172a; fill-opacity: 0.8; stroke: #67e8f9; stroke-opacity: 0.25; }
+    .pin { stroke: #67e8f9; stroke-opacity: 0.35; stroke-width: 2; stroke-linecap: round; fill: none; }
+    .blk { fill: #a5f3fc; fill-opacity: 0.6; font-size: 10px; letter-spacing: 1.2px; text-anchor: middle; }
+    .key { fill: #94a3b8; font-size: 9px; letter-spacing: 1.8px; }
+    .val { fill: #a5f3fc; font-size: 14px; font-weight: 600; }
+    .trace { stroke: #67e8f9; stroke-opacity: 0.18; stroke-width: 2; fill: none; }
+    .pulse { stroke: #67e8f9; stroke-opacity: 0.85; stroke-width: 2; fill: none; stroke-linecap: round; stroke-dasharray: 12 88; }
+    text { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+    @media (prefers-reduced-motion: no-preference) {
+      .pulse { animation: flow 3s linear infinite; }
+    }
+    @keyframes flow { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+  </style>
+
+  <rect x="48" y="34" width="654" height="502" fill="#020617"/>
+  <circle cx="380" cy="280" r="150" fill="url(#halo)"/>
+
+  <!-- 배터리에서 주변 블록으로 뻗는 회로 트레이스 -->
+  <g>
+    <path class="trace" d="M285 170 H160 L130 140 H84"/>
+    <path class="pulse" pathLength="100" d="M285 170 H160 L130 140 H84" style="animation-delay:0s"/>
+    <path class="trace" d="M285 280 H112"/>
+    <path class="pulse" pathLength="100" d="M285 280 H112" style="animation-delay:-0.45s"/>
+    <path class="trace" d="M285 390 H210 L180 420 H130"/>
+    <path class="pulse" pathLength="100" d="M285 390 H210 L180 420 H130" style="animation-delay:-0.9s"/>
+    <path class="trace" d="M475 160 H560 L590 130 H610"/>
+    <path class="pulse" pathLength="100" d="M475 160 H560 L590 130 H610" style="animation-delay:-1.35s"/>
+    <path class="trace" d="M475 280 H642 V172"/>
+    <path class="pulse" pathLength="100" d="M475 280 H642 V172" style="animation-delay:-1.8s"/>
+    <path class="trace" d="M475 360 H540 L570 390 H620"/>
+    <path class="pulse" pathLength="100" d="M475 360 H540 L570 390 H620" style="animation-delay:-2.25s"/>
+    <path class="trace" d="M350 115 V70 H300"/>
+    <path class="trace" d="M420 115 V55 H500"/>
+    <path class="trace" d="M345 445 V500"/>
+    <path class="trace" d="M415 445 V480 H470"/>
+  </g>
+
+  <!-- 비아 -->
+  <g fill="#020617" stroke="#67e8f9" stroke-opacity="0.4" stroke-width="1.5">
+    <circle cx="76" cy="140" r="3.5"/>
+    <circle cx="104" cy="280" r="3.5"/>
+    <circle cx="292" cy="70" r="3.5"/>
+    <circle cx="508" cy="55" r="3.5"/>
+    <circle cx="478" cy="480" r="3.5"/>
+  </g>
+
+  <!-- 접지 심볼 -->
+  <g class="pin">
+    <path d="M200 280 V328"/>
+    <path d="M188 332 H212"/>
+    <path d="M188 340 H212"/>
+    <path d="M200 340 V352"/>
+    <path d="M186 356 H214"/>
+    <path d="M191 362 H209"/>
+    <path d="M196 368 H204"/>
+    <path d="M331 504 H359"/>
+    <path d="M336 510 H354"/>
+    <path d="M341 516 H349"/>
+  </g>
+
+  <!-- 주변 블록: DC-DC · PMIC · MCU · SENSE -->
+  <rect class="chip" x="150" y="152" width="70" height="36" rx="6"/>
+  <text class="blk" x="185" y="174">DC-DC</text>
+  <rect class="chip" x="60" y="402" width="70" height="36" rx="6"/>
+  <text class="blk" x="95" y="424">PMIC</text>
+  <rect class="chip" x="610" y="98" width="64" height="64" rx="6"/>
+  <text class="blk" x="642" y="134">MCU</text>
+  <g class="pin">
+    <path d="M598 110 H610"/><path d="M674 110 H686"/>
+    <path d="M598 130 H610"/><path d="M674 130 H686"/>
+    <path d="M598 150 H610"/><path d="M674 150 H686"/>
+    <path d="M622 86 V98"/><path d="M622 162 V174"/>
+    <path d="M642 86 V98"/><path d="M642 162 V174"/>
+    <path d="M662 86 V98"/><path d="M662 162 V174"/>
+  </g>
+  <rect class="chip" x="620" y="376" width="56" height="28" rx="6"/>
+  <text class="blk" x="648" y="394">SENSE</text>
+
+  <!-- 배터리 단자 -->
+  <path d="M348 112 a8 8 0 0 1 8-8 h48 a8 8 0 0 1 8 8 v8 h-64 z" fill="#334155" stroke="#ffffff" stroke-opacity="0.1"/>
+
+  <!-- 배터리 본체 -->
+  <rect x="280" y="120" width="200" height="320" rx="26" fill="url(#shell)" stroke="#ffffff" stroke-opacity="0.1"/>
+
+  <!-- SoC 게이지: 맨 위 한 칸은 비어 있고 아래 네 칸이 충전됨 -->
+  <rect x="296" y="136" width="168" height="49.6" rx="12" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.1"/>
+  <g filter="url(#bloom)" opacity="0.5">
+    <rect x="296" y="195.6" width="168" height="49.6" rx="12" fill="url(#charge)"/>
+    <rect x="296" y="255.2" width="168" height="49.6" rx="12" fill="url(#charge)"/>
+    <rect x="296" y="314.8" width="168" height="49.6" rx="12" fill="url(#charge)"/>
+    <rect x="296" y="374.4" width="168" height="49.6" rx="12" fill="url(#charge)"/>
+  </g>
+  <g fill="url(#charge)">
+    <rect x="296" y="195.6" width="168" height="49.6" rx="12"/>
+    <rect x="296" y="255.2" width="168" height="49.6" rx="12"/>
+    <rect x="296" y="314.8" width="168" height="49.6" rx="12"/>
+    <rect x="296" y="374.4" width="168" height="49.6" rx="12"/>
+  </g>
+
+  <!-- 충전 상태 배지 -->
+  <rect x="329.5" y="52" width="101" height="24" rx="12" fill="#0f172a" fill-opacity="0.8" stroke="#6ee7b7" stroke-opacity="0.25"/>
+  <circle cx="344.5" cy="64" r="3" fill="#34d399"/>
+  <text x="353.5" y="67.5" fill="#6ee7b7" font-size="10" letter-spacing="2.5">CHARGING</text>
+
+  <!-- 텔레메트리 -->
+  <g>
+    <rect class="chip" x="220" y="116" width="52" height="47" rx="8"/>
+    <text class="key" x="232" y="132">SOC</text>
+    <text class="val" x="232" y="151">82%</text>
+
+    <rect class="chip" x="464" y="188" width="76" height="47" rx="8"/>
+    <text class="key" x="476" y="204">VOLT</text>
+    <text class="val" x="476" y="223">3.98 V</text>
+
+    <rect class="chip" x="224" y="341" width="86" height="47" rx="8"/>
+    <text class="key" x="236" y="357">TEMP</text>
+    <text class="val" x="236" y="376">27.4 °C</text>
+
+    <rect class="chip" x="484" y="405" width="52" height="47" rx="8"/>
+    <text class="key" x="496" y="421">SOH</text>
+    <text class="val" x="496" y="440">97%</text>
+  </g>
+</svg>

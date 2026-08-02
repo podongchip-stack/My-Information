@@ -197,7 +197,7 @@ export const work: WorkItem[] = [
     ongoing: true,
     kind: "research",
     tech: ["LSTM", "Transformer", "Ansys", "MATLAB"],
-    links: [],
+    links: [{ label: "EDCL Lab", href: "https://edcl-page.vercel.app/" }],
   },
   {
     slug: "stock-agent",
@@ -255,7 +255,7 @@ export const work: WorkItem[] = [
     ongoing: true,
     kind: "backend",
     tech: ["HTML", "CSS", "JavaScript", "Firebase"],
-    links: [],
+    links: [{ label: "Website", href: "https://edcl-page.vercel.app/" }],
   },
 ];
 
