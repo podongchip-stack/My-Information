@@ -3,7 +3,7 @@
 개인 포트폴리오 웹사이트입니다. 검은 배경 위에 git 그래프 형태의 타임라인을 세우고,
 글 대신 숫자와 차트로 정보를 전달합니다. 한국어/영어를 지원합니다.
 
-🔗 **Live:** [my-information-mu.vercel.app](https://my-information-mu.vercel.app)
+🔗 **Live:** [podongchip.vercel.app](https://podongchip.vercel.app)
 
 ![메인 화면](docs/main.png)
 
