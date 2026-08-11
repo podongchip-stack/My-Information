@@ -8,8 +8,10 @@ import { timeline, type TimelineItem } from "@/data/timeline";
 import { workBySlug } from "@/data/work";
 import {
   getOpenSourceStats,
+  groupArtifacts,
   PLATFORM_LABEL,
   type ArtifactStat,
+  type ReleaseGroup,
 } from "@/lib/stats";
 import { getUI, type UIDict } from "@/lib/content/ui";
 import type { Lang } from "@/lib/i18n";
@@ -300,24 +302,94 @@ function CardDetail({
   );
 }
 
-/** 릴리즈 행 — 공개한 데이터셋·모델. 카드 없이 git tag처럼 붙는다 */
+/** 다운로드 비례 바 너비(px) — 0건도 흔적은 남긴다 */
+function barWidth(downloads: number, max: number): number {
+  return Math.max(Math.round((downloads / max) * 72), downloads > 0 ? 6 : 2);
+}
+
+/** 가지 이음선 — 릴리즈 노드 아래에서 플랫폼별로 갈라지는 ├ / └ */
+function ForkConnector({
+  side,
+  last,
+}: {
+  side: "left" | "right";
+  last: boolean;
+}) {
+  // 모바일은 항상 왼쪽에서, 데스크톱 왼쪽 열에서는 오른쪽에서 뻗는다
+  const edge = side === "left" ? "left-0 sm:left-auto sm:right-0" : "left-0";
+  return (
+    <span aria-hidden className="relative block h-5 w-3 shrink-0">
+      <span
+        className={`absolute top-0 w-px bg-release/45 ${
+          last ? "h-[10px]" : "h-full"
+        } ${edge}`}
+      />
+      <span className={`absolute top-[10px] h-px w-3 bg-release/45 ${edge}`} />
+    </span>
+  );
+}
+
+/** 플랫폼 가지 한 줄 — 같은 공개물이 어디에 올라가 있는지 */
+function PlatformBranch({
+  source,
+  side,
+  max,
+  last,
+}: {
+  source: ArtifactStat;
+  side: "left" | "right";
+  max: number;
+  last: boolean;
+}) {
+  return (
+    <span
+      className={`flex h-5 items-center gap-2 ${
+        side === "left" ? "sm:flex-row-reverse" : ""
+      }`}
+    >
+      <ForkConnector side={side} last={last} />
+      <a
+        href={source.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs text-muted transition-colors hover:text-accent"
+      >
+        {PLATFORM_LABEL[source.platform]}{" "}
+        <span aria-hidden className="text-faint">
+          ↗
+        </span>
+      </a>
+      <span
+        aria-hidden
+        className="h-1.5 rounded-full bg-release"
+        style={{ width: `${barWidth(source.downloads, max)}px` }}
+      />
+      <span className="font-mono text-xs text-muted tabular-nums">
+        {source.downloads.toLocaleString()}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * 릴리즈 행 — 공개한 데이터셋·모델. 카드 없이 git tag처럼 붙는다.
+ * 같은 공개물을 두 플랫폼에 올렸으면 한 노드에서 플랫폼별로 갈라진다.
+ */
 function ReleaseRow({
-  artifact,
+  group,
   side,
   max,
   ui,
 }: {
-  artifact: ArtifactStat;
+  group: ReleaseGroup;
   side: "left" | "right";
   max: number;
   ui: UIDict;
 }) {
   const alignEnd = side === "left" ? "sm:items-end sm:text-right" : "";
   const justifyEnd = side === "left" ? "sm:justify-end" : "";
-  const barWidth = Math.max(
-    Math.round((artifact.downloads / max) * 72),
-    artifact.downloads > 0 ? 6 : 2
-  );
+  const [only] = group.sources;
+  const single = group.sources.length === 1;
 
   return (
     <div className={`flex flex-col ${alignEnd}`}>
@@ -325,38 +397,67 @@ function ReleaseRow({
         className={`flex flex-wrap items-center gap-x-2 text-xs text-faint ${justifyEnd}`}
       >
         <span className="font-mono tabular-nums">
-          {toYearMonth(artifact.createdAt!)}
+          {toYearMonth(group.createdAt)}
         </span>
         <span className="rounded-sm border border-release/60 px-1.5 py-0.5 text-release">
-          {ui.downloads.kinds[artifact.kind]}
+          {ui.downloads.kinds[group.kind]}
         </span>
-        <span>· {PLATFORM_LABEL[artifact.platform]}</span>
+        {single ? (
+          <span>· {PLATFORM_LABEL[only.platform]}</span>
+        ) : (
+          <span className="tabular-nums">
+            · {ui.downloads.total(group.downloads.toLocaleString())}
+          </span>
+        )}
       </p>
 
       <p className="mt-1.5 text-sm font-medium">
-        <a
-          href={artifact.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-accent"
-        >
-          {artifact.title}{" "}
-          <span aria-hidden className="text-faint">
-            ↗
-          </span>
-        </a>
+        {single ? (
+          <a
+            href={only.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-accent"
+          >
+            {group.title}{" "}
+            <span aria-hidden className="text-faint">
+              ↗
+            </span>
+          </a>
+        ) : (
+          group.title
+        )}
       </p>
 
-      <p className={`mt-1.5 flex items-center gap-2 ${justifyEnd}`}>
-        <span
-          aria-hidden
-          className="h-1.5 rounded-full bg-release"
-          style={{ width: `${barWidth}px` }}
-        />
-        <span className="font-mono text-xs text-muted tabular-nums">
-          {artifact.downloads.toLocaleString()}
-        </span>
-      </p>
+      {single ? (
+        <p className={`mt-1.5 flex items-center gap-2 ${justifyEnd}`}>
+          <span
+            aria-hidden
+            className="h-1.5 rounded-full bg-release"
+            style={{ width: `${barWidth(only.downloads, max)}px` }}
+          />
+          <span className="font-mono text-xs text-muted tabular-nums">
+            {only.downloads.toLocaleString()}
+          </span>
+        </p>
+      ) : (
+        <ul
+          className={`mt-1 flex flex-col ${
+            side === "left" ? "sm:items-end" : ""
+          }`}
+        >
+          {group.sources.map((source, i) => (
+            <li key={`${source.platform}-${source.id}`}>
+              <PlatformBranch
+                source={source}
+                side={side}
+                max={max}
+                last={i === group.sources.length - 1}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -364,7 +465,7 @@ function ReleaseRow({
 /** 그래프에 얹는 항목 — 타임라인 카드 또는 릴리즈 */
 type Entry =
   | { type: "item"; date: string; item: TimelineItem }
-  | { type: "release"; date: string; artifact: ArtifactStat };
+  | { type: "release"; date: string; group: ReleaseGroup };
 
 /**
  * git 그래프 타임라인 — 가운데 main 줄기를 두고 위(과거)에서 아래(현재)로
@@ -376,19 +477,23 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
   const ui = getUI(lang);
   const { artifacts } = await getOpenSourceStats();
 
-  const dated = artifacts.filter((a) => a.createdAt);
-  const max = Math.max(...dated.map((a) => a.downloads), 1);
+  // 같은 공개물의 플랫폼별 배포는 한 노드로 묶어 세로 길이를 줄인다
+  const groups = groupArtifacts(artifacts);
+  const max = Math.max(
+    ...groups.flatMap((g) => g.sources.map((s) => s.downloads)),
+    1
+  );
 
   // 내릴수록 최신 — 오래된 것부터. 같은 달이면 카드가 릴리즈보다 먼저.
   const entries: Entry[] = [
     ...timeline.map(
       (item): Entry => ({ type: "item", date: item.start, item })
     ),
-    ...dated.map(
-      (artifact): Entry => ({
+    ...groups.map(
+      (group): Entry => ({
         type: "release",
-        date: toYearMonth(artifact.createdAt!),
-        artifact,
+        date: toYearMonth(group.createdAt),
+        group,
       })
     ),
   ].sort((a, b) => a.date.localeCompare(b.date));
@@ -417,9 +522,7 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
     sideIndex += 1;
 
     const key =
-      entry.type === "item"
-        ? entry.item.id
-        : `release-${entry.artifact.platform}-${entry.artifact.id}`;
+      entry.type === "item" ? entry.item.id : `release-${entry.group.key}`;
 
     const isAward = entry.type === "item" && entry.item.kind === "award";
 
@@ -458,7 +561,7 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
               />
             ) : (
               <ReleaseRow
-                artifact={entry.artifact}
+                group={entry.group}
                 side={side}
                 max={max}
                 ui={ui}

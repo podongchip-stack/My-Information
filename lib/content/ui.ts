@@ -45,6 +45,8 @@ export interface UIDict {
   };
   downloads: {
     empty: string;
+    /** 여러 플랫폼에 올린 공개물의 합계 표기 */
+    total: (count: string) => string;
     kinds: { dataset: string; model: string };
   };
   modal: {
@@ -100,6 +102,7 @@ const ko: UIDict = {
   },
   downloads: {
     empty: "통계를 불러오지 못했습니다.",
+    total: (count) => `누적 ${count}`,
     kinds: { dataset: "데이터셋", model: "모델" },
   },
   modal: {
@@ -156,6 +159,7 @@ const en: UIDict = {
   },
   downloads: {
     empty: "Could not load statistics.",
+    total: (count) => `${count} total`,
     kinds: { dataset: "Dataset", model: "Model" },
   },
   modal: {
