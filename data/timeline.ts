@@ -3,6 +3,7 @@ import type { L10n } from "@/lib/i18n";
 // additionaldata/ 파일명 규칙은 additionaldata/type.md 참고 — category_num_type (3=프로젝트, 4=수상, num은 시간순)
 import labHero from "@/additionaldata/3_1_image.svg";
 import aiRookiePoster from "@/additionaldata/3_2_image.png";
+import shortsFrames from "@/additionaldata/3_3_image.jpg";
 import gnuEsgPoster from "@/additionaldata/4_1_image.jpg";
 import busanPoster from "@/additionaldata/4_2_image.jpg";
 
@@ -30,6 +31,37 @@ export interface TimelineItem {
 }
 
 export const timeline: TimelineItem[] = [
+  {
+    id: "shorts-pipeline",
+    start: "2026.08",
+    ongoing: true,
+    kind: "project",
+    image: shortsFrames,
+    title: {
+      ko: "유튜브 쇼츠 제작 자동화 파이프라인",
+      en: "YouTube Shorts production pipeline",
+    },
+    org: { ko: "개인 프로젝트", en: "Solo project" },
+    detail: {
+      ko: "AI가 쌓은 대본에서 한 편을 고르면 말투 교정·목소리·이미지·영상·자막 합성을 로컬 PC의 GPU에서 로컬 모델로 끝내 검수용 쇼츠를 만듭니다. API 토큰 비용 없음.",
+      en: "Pick one of the AI-stacked scripts and local models on the local PC's GPU handle the voice edit, narration, images, video and captions, delivering a Short ready for review. No API token costs.",
+    },
+    highlights: {
+      ko: [
+        "**주제 조사 · 대본** — 매 정각 AI가 조사해 스택에 쌓고, 사람은 고르기만",
+        "**말투 교정 → 목소리 → 이미지·영상 → 자막 합성** — 로컬 PC GPU·로컬 모델로 무인, **API 토큰 비용 0**",
+        "**아이폰 앱** — 진행률·검수 재생·수락/반려, 컷 하나만 고쳐 다시 만들기",
+        "**대화로 고치기** — '컷 3 더 쉽게' 같은 요청에 수정 제안을 받아 골라 적용",
+      ],
+      en: [
+        "**Research & script** — an AI researches a topic every hour and stacks it; people only pick",
+        "**Voice edit → narration → image & video → captions** — local models on the local PC's GPU, unattended, **zero API token cost**",
+        "**iPhone app** — progress, review playback, approve/reject; fix one cut and rebuild just that",
+        "**Fix by chat** — ask for 'cut 3, simpler' and pick from the proposed edits",
+      ],
+    },
+    workSlug: "shorts-pipeline",
+  },
   {
     id: "ai-rookie",
     start: "2026.07",
