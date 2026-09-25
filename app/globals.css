@@ -1,12 +1,57 @@
 @import "tailwindcss";
 
 /*
- * 팔레트 — 검은 배경 + 네이버 그린.
- * 그린(#03c75a)이 링크·커밋 점·차트 마크를 모두 담당하는 단일 메인 컬러다.
- * accent-dim은 같은 색조의 어두운 단계로, 그래프 줄기와 "개선 전" 값에 쓴다.
- * 본문 대비: foreground 16.9:1, muted 8.1:1, faint 5.9:1, accent 8.8:1 (WCAG AA 이상).
+ * 팔레트 — 흰 배경 기본 + 네이버 그린. 다크는 시스템 설정을 따르고,
+ * 상단 테마 버튼이 html[data-theme]로 덮어쓴다(아래 두 블록).
+ * accent(#03c75a)는 채움(버튼·막대) 전용이다. 흰 바탕에서 글자로 쓰면
+ * 대비가 모자라서, 글자에는 accent-ink를 쓴다.
+ * on-accent는 그린 채움 위 글자색 — 두 테마 모두 검정이다.
  */
 @theme {
+  --color-background: #ffffff;
+  --color-surface: #f5f6f7;
+  --color-surface-hover: #eef0f2;
+  --color-foreground: #111315;
+  --color-muted: #5b6168;
+  --color-faint: #6f757d;
+  --color-line: #e7e9ec;
+  --color-line-strong: #d3d6da;
+  --color-accent: #03c75a;
+  --color-accent-ink: #00843a;
+  --color-accent-dim: #0e8a44;
+  --color-on-accent: #0a0a0a;
+
+  /*
+   * 카테고리 색 — 프로젝트=그린(accent), 릴리즈=블루, 수상=골드, 자격증=핑크.
+   * 색만으로 구분하지 않고 항상 텍스트 라벨이 함께 붙는다.
+   */
+  --color-release: #2563d9;
+  --color-award: #9a6f00;
+  --color-cert: #c2417a;
+
+  --font-sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", SFMono-Regular, "SF Mono", Menlo,
+    Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-background: #0a0a0a;
+    --color-surface: #121212;
+    --color-surface-hover: #1b1b1b;
+    --color-foreground: #ededed;
+    --color-muted: #a6a6a6;
+    --color-faint: #8c8c8c;
+    --color-line: #232323;
+    --color-line-strong: #3a3a3a;
+    --color-accent-ink: #03c75a;
+    --color-release: #6d9bff;
+    --color-award: #d4a73a;
+    --color-cert: #e87ba4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
   --color-background: #0a0a0a;
   --color-surface: #121212;
   --color-surface-hover: #1b1b1b;
@@ -15,22 +60,11 @@
   --color-faint: #8c8c8c;
   --color-line: #232323;
   --color-line-strong: #3a3a3a;
-  --color-accent: #03c75a;
-  --color-accent-dim: #0e8a44;
-
-  /*
-   * 카테고리 색 — KPI 카드 테두리와 그래프 노드·칩이 같은 색을 공유한다.
-   * 프로젝트=그린(accent), 릴리즈=블루, 수상=골드, 자격증=핑크.
-   * dataviz 검증: 골드↔그린 색각이상 ΔE 7.8(허용 밴드 — 모든 카테고리에
-   * 텍스트 라벨이 함께 붙는 조건), 일반시각·배경 대비는 전부 통과.
-   */
-  --color-release: #3987e5;
-  --color-award: #b8860b;
+  --color-accent-ink: #03c75a;
+  --color-release: #6d9bff;
+  --color-award: #d4a73a;
   --color-cert: #e87ba4;
-
-  --font-sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Mono", SFMono-Regular, "SF Mono", Menlo,
-    Consolas, monospace;
+  color-scheme: dark;
 }
 
 html {
@@ -49,7 +83,7 @@ body {
 
 ::selection {
   background: var(--color-accent);
-  color: #0a0a0a;
+  color: var(--color-on-accent);
 }
 
 /* 모달 등장 — 살짝 아래에서 떠오른다 (reduced-motion이면 전역 규칙이 끔) */

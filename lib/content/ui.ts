@@ -16,8 +16,11 @@ export interface UIDict {
     role: string;
     affiliation: string;
     lab: string;
-    claim: string;
+    /** 히어로 문장 — em 부분만 그린으로 강조된다 */
+    claim: { lead: string; em: string; tail: string };
+    email: string;
     switchLang: string;
+    theme: string;
   };
   kpi: {
     downloads: string;
@@ -59,21 +62,26 @@ export interface UIDict {
 
 const ko: UIDict = {
   meta: {
-    title: "김동현 — 백엔드 · AI 엔지니어",
+    title: "김동현 — Backend Developer · AI System Engineer",
     description:
-      "온프레미스 문서 인식 파이프라인, BMS SoC/SoH 예측 연구, 백엔드 개발. 경상국립대 전자공학부 · EDCL 랩.",
-    ogTitle: "김동현 — 백엔드 · AI 엔지니어",
+      "생성형 LLM이 하던 응급 통화 구조화를 직접 설계한 분류 모델로 바꿔 응답 39ms, 문서 인식 재현율 68% → 88%. 경상국립대 전자공학부 · EDCL 랩.",
+    ogTitle: "김동현 — Backend Developer · AI System Engineer",
     ogDescription:
-      "측정 가능한 결과로 말하는 포트폴리오 — 문서 인식 파이프라인 재현율 68% → 88%, VRAM 1/4.",
+      "14B LLM이 하던 일을, 직접 설계한 모델로 39ms에.",
   },
   hero: {
-    name: "KIM DONG HYEON",
-    role: "백엔드 · AI 엔지니어",
+    name: "김동현",
+    role: "Backend Developer · AI System Engineer",
     affiliation: "경상국립대학교 전자공학부",
     lab: "BNIT EDCL LAB",
-    claim:
-      "전자공학을 기반으로 백엔드와 AI를 오가며, 모든 결과를 측정 가능한 숫자로 남기는 개발자입니다.",
+    claim: {
+      lead: "14B LLM이 하던 일을, 직접 설계한 모델로 ",
+      em: "39ms",
+      tail: "에.",
+    },
+    email: "이메일 보내기",
     switchLang: "English로 보기",
+    theme: "밝은 화면과 어두운 화면 전환",
   },
   kpi: {
     downloads: "오픈소스 누적 다운로드",
@@ -114,22 +122,27 @@ const ko: UIDict = {
 
 const en: UIDict = {
   meta: {
-    title: "Donghyeon Kim — Backend · AI Engineer",
+    title: "Donghyeon Kim — Backend Developer · AI System Engineer",
     description:
-      "On-premise document recognition pipelines, battery SoC/SoH prediction research, backend development. Gyeongsang National University, EDCL Lab.",
-    ogTitle: "Donghyeon Kim — Backend · AI Engineer",
+      "Replaced a generative LLM in emergency-call structuring with a classifier I designed, answering in 39 ms; lifted document recognition recall from 68% to 88%. Gyeongsang National University, EDCL Lab.",
+    ogTitle: "Donghyeon Kim — Backend Developer · AI System Engineer",
     ogDescription:
-      "A portfolio that argues with numbers — document recognition recall 68% → 88% at a quarter of the VRAM.",
+      "The job a 14B LLM did, done by a model I designed in 39 ms.",
   },
   hero: {
-    name: "KIM DONG HYEON",
-    role: "Backend · AI Engineer",
+    name: "Donghyeon Kim",
+    role: "Backend Developer · AI System Engineer",
     affiliation:
       "Dept. of Electronic Engineering, Gyeongsang National University",
     lab: "BNIT EDCL LAB",
-    claim:
-      "An engineer grounded in electronics, moving between backend and AI — leaving every result as a measurable number.",
+    claim: {
+      lead: "The job a 14B LLM did, done by a model I designed in ",
+      em: "39 ms",
+      tail: ".",
+    },
+    email: "Email me",
     switchLang: "한국어로 보기",
+    theme: "Switch between light and dark",
   },
   kpi: {
     downloads: "Open-source downloads",

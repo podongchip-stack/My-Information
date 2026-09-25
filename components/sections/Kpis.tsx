@@ -193,7 +193,7 @@ function ProjectsList({ ui, lang }: { ui: UIDict; lang: Lang }) {
               {item.ongoing ? " —" : ""}
             </span>
             {item.ongoing && (
-              <span className="text-accent">{ui.timeline.ongoing}</span>
+              <span className="text-accent-ink">{ui.timeline.ongoing}</span>
             )}
           </p>
           <p className="mt-1 text-sm font-medium">{item.title[lang]}</p>

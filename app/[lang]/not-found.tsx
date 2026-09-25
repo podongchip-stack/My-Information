@@ -13,13 +13,13 @@ export default function NotFound() {
       <p className="mt-8 flex gap-6 text-sm">
         <Link
           href="/ko"
-          className="text-accent underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-accent"
+          className="text-accent-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-accent"
         >
           한국어
         </Link>
         <Link
           href="/en"
-          className="text-accent underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-accent"
+          className="text-accent-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-accent"
         >
           English
         </Link>

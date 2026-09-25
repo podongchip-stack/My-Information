@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 import { HTML_LANG, LANGS, isLang, type Lang } from "@/lib/i18n";
 import { getUI } from "@/lib/content/ui";
+import { themeInitScript } from "@/lib/theme";
 
 const SITE_URL = "https://podongchip.vercel.app";
 
@@ -64,8 +65,14 @@ export default async function LangLayout({
   const typed: Lang = lang;
 
   return (
-    <html lang={HTML_LANG[typed]} className="h-full antialiased">
+    // 테마 스크립트가 data-theme을 먼저 붙이므로 html 속성 불일치 경고는 의도된 것
+    <html
+      lang={HTML_LANG[typed]}
+      className="h-full antialiased"
+      suppressHydrationWarning
+    >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link
           rel="stylesheet"
           as="style"

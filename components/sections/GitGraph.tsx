@@ -102,7 +102,7 @@ function BranchCard({
           <p className="flex flex-wrap items-center gap-x-2 text-xs text-faint">
             <span className="font-mono tabular-nums">{period(item)}</span>
             {item.ongoing && (
-              <span className="text-accent">{ui.timeline.ongoing}</span>
+              <span className="text-accent-ink">{ui.timeline.ongoing}</span>
             )}
             {isAward ? (
               <span className="rounded-sm border border-award/60 px-1.5 py-0.5 text-award">
@@ -157,7 +157,7 @@ function BranchCard({
       {/* 카드 전체가 모달을 여는 버튼임을 알리는 힌트 */}
       <p
         className={`mt-3 text-right text-xs ${
-          isAward ? "text-award" : "text-accent"
+          isAward ? "text-award" : "text-accent-ink"
         }`}
       >
         {ui.modal.more} →
@@ -186,7 +186,7 @@ function CardDetail({
       <p className="flex flex-wrap items-center gap-x-2 pr-8 text-xs text-faint">
         <span className="font-mono tabular-nums">{period(item)}</span>
         {item.ongoing && (
-          <span className="text-accent">{ui.timeline.ongoing}</span>
+          <span className="text-accent-ink">{ui.timeline.ongoing}</span>
         )}
         {isAward ? (
           <span className="rounded-sm border border-award/60 px-1.5 py-0.5 text-award">
@@ -257,7 +257,7 @@ function CardDetail({
                 </span>
                 <span className="font-semibold">{vram.after}</span>
               </span>{" "}
-              <span className="text-accent">
+              <span className="text-accent-ink">
                 −{Math.round((1 - num(vram.after) / num(vram.before!)) * 100)}%
               </span>
             </p>
@@ -340,7 +340,7 @@ function PlatformBranch({
         href={source.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-xs text-muted transition-colors hover:text-accent"
+        className="text-xs text-muted transition-colors hover:text-accent-ink"
       >
         {PLATFORM_LABEL[source.platform]}{" "}
         <span aria-hidden className="text-faint">
@@ -405,7 +405,7 @@ function ReleaseRow({
             href={only.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-accent"
+            className="transition-colors hover:text-accent-ink"
           >
             {group.title}{" "}
             <span aria-hidden className="text-faint">
@@ -578,7 +578,7 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
         <li className="relative pb-2">
           <Reveal>
             <CommitDot hollow />
-            <p className="ml-12 pt-0.5 text-xs text-accent sm:ml-0 sm:text-center">
+            <p className="ml-12 pt-0.5 text-xs text-accent-ink sm:ml-0 sm:text-center">
               <span className="font-mono">HEAD</span> → {ui.timeline.present}
             </p>
           </Reveal>
