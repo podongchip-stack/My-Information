@@ -40,7 +40,6 @@ export interface UIDict {
     present: string;
     ongoing: string;
     poster: string;
-    graphic: string;
     kinds: { work: string; project: string; award: string };
   };
   downloads: {
@@ -97,7 +96,6 @@ const ko: UIDict = {
     present: "현재",
     ongoing: "진행 중",
     poster: "포스터",
-    graphic: "대표 이미지",
     kinds: { work: "연구", project: "개발", award: "수상" },
   },
   downloads: {
@@ -154,7 +152,6 @@ const en: UIDict = {
     present: "Now",
     ongoing: "Ongoing",
     poster: "poster",
-    graphic: "key visual",
     kinds: { work: "Research", project: "Engineering", award: "Award" },
   },
   downloads: {

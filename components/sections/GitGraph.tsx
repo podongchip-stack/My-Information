@@ -120,11 +120,7 @@ function BranchCard({
         {item.image && (
           <Image
             src={item.image}
-            alt={`${item.title[lang]} ${
-              item.imageKind === "graphic"
-                ? ui.timeline.graphic
-                : ui.timeline.poster
-            }`}
+            alt={`${item.title[lang]} ${ui.timeline.poster}`}
             sizes="56px"
             className="w-14 shrink-0 rounded-sm border border-line"
           />
@@ -233,22 +229,14 @@ function CardDetail({
         </ul>
       )}
 
-      {item.image &&
-        (item.imageKind === "graphic" ? (
-          <Image
-            src={item.image}
-            alt={`${item.title[lang]} ${ui.timeline.graphic}`}
-            sizes="18rem"
-            className="mt-4 w-72 max-w-full rounded-md border border-line"
-          />
-        ) : (
-          <Image
-            src={item.image}
-            alt={`${item.title[lang]} ${ui.timeline.poster}`}
-            sizes="(min-width: 640px) 28rem, 100vw"
-            className="mt-4 w-full rounded-md border border-line"
-          />
-        ))}
+      {item.image && (
+        <Image
+          src={item.image}
+          alt={`${item.title[lang]} ${ui.timeline.poster}`}
+          sizes="(min-width: 640px) 28rem, 100vw"
+          className="mt-4 w-full rounded-md border border-line"
+        />
+      )}
 
       {metrics && (
         <div className="mt-5 border-t border-line pt-4">

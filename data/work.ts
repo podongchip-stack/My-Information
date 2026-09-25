@@ -1,6 +1,6 @@
 import type { L10n } from "@/lib/i18n";
 
-export type WorkKind = "research" | "ai" | "backend";
+export type WorkKind = "research" | "ai";
 
 /** 수치 비교 한 줄. before가 있으면 "이전 → 이후"로 렌더링된다. */
 export interface Metric {
@@ -272,22 +272,6 @@ export const work: WorkItem[] = [
         href: "https://huggingface.co/datasets/podongchip/korean-ai-prompt-style-dataset",
       },
     ],
-  },
-  {
-    slug: "lab-website",
-    title: {
-      ko: "연구실 웹사이트 개발 · 운영",
-      en: "Lab Website — Development and Operations",
-    },
-    summary: {
-      ko: "EDCL 연구실 웹사이트를 Firebase와 연동해 개발하고 유지보수하고 있습니다.",
-      en: "Building and maintaining the EDCL lab website, wired up to Firebase.",
-    },
-    period: "2026.04",
-    ongoing: true,
-    kind: "backend",
-    tech: ["HTML", "CSS", "JavaScript", "Firebase"],
-    links: [{ label: "Website", href: "https://edcl-page.vercel.app/" }],
   },
 ];
 
