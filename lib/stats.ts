@@ -185,14 +185,6 @@ export function groupArtifacts(artifacts: ArtifactStat[]): ReleaseGroup[] {
   return list;
 }
 
-/** ISR 재생성 시각 — 라이브 수치 옆에 기준일로 표기한다 */
-export function asOfDate(): string {
-  const d = new Date();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}.${mm}.${dd}`;
-}
-
 export async function getOpenSourceStats(): Promise<{
   artifacts: ArtifactStat[];
   totalDownloads: number;

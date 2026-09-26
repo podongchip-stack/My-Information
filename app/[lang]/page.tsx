@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Hero from "@/components/ui/Hero";
 import Footer from "@/components/ui/Footer";
-import Kpis from "@/components/sections/Kpis";
+import ResultWindow from "@/components/sections/ResultWindow";
+import Stats from "@/components/sections/Stats";
 import GitGraph from "@/components/sections/GitGraph";
 import { isLang } from "@/lib/i18n";
 
@@ -17,7 +18,8 @@ export default async function Home({
     <div className="mx-auto max-w-[1080px] px-4 md:px-8">
       <Hero lang={lang} />
       <main>
-        <Kpis lang={lang} />
+        <ResultWindow lang={lang} />
+        <Stats lang={lang} />
         <div className="mt-14">
           <GitGraph lang={lang} />
         </div>

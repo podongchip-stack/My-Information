@@ -24,10 +24,11 @@ export interface UIDict {
   };
   kpi: {
     downloads: string;
-    downloadsNote: (date: string) => string;
+    downloadsNote: string;
+    releases: string;
+    releasesNote: string;
     certs: string;
     certsNote: (date: string) => string;
-    certsEmpty: string;
     projects: string;
     projectsNote: (ongoing: number) => string;
     awards: string;
@@ -85,10 +86,11 @@ const ko: UIDict = {
   },
   kpi: {
     downloads: "오픈소스 누적 다운로드",
-    downloadsNote: (date) => `${date} 기준 · 실시간`,
+    downloadsNote: "Hugging Face · Kaggle 실시간",
+    releases: "공개 데이터셋 · 모델",
+    releasesNote: "Hugging Face · Kaggle",
     certs: "자격증 보유",
     certsNote: (date) => `최근 취득 ${date}`,
-    certsEmpty: "목록 준비 중",
     projects: "프로젝트",
     projectsNote: (ongoing) => `${ongoing}건 진행 중`,
     awards: "수상",
@@ -146,10 +148,11 @@ const en: UIDict = {
   },
   kpi: {
     downloads: "Open-source downloads",
-    downloadsNote: (date) => `as of ${date} · live`,
+    downloadsNote: "Hugging Face · Kaggle, live",
+    releases: "Public datasets · models",
+    releasesNote: "Hugging Face · Kaggle",
     certs: "Certifications",
     certsNote: (date) => `latest ${date}`,
-    certsEmpty: "List in progress",
     projects: "Projects",
     projectsNote: (ongoing) => `${ongoing} ongoing`,
     awards: "Awards",
