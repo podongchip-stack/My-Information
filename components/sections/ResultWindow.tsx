@@ -25,7 +25,7 @@ export default function ResultWindow({ lang }: { lang: Lang }) {
           <p className="text-[0.8125rem] font-medium text-muted">
             {highlight.label[lang]}
           </p>
-          <p className="mt-1.5 flex flex-wrap items-baseline gap-x-3.5 font-mono tabular-nums">
+          <p className="mt-1.5 flex flex-wrap items-baseline gap-x-3.5 font-sans tabular-nums">
             <span className="text-[clamp(1.75rem,7vw,2.75rem)] text-faint">
               {highlight.before}
             </span>
@@ -47,7 +47,7 @@ export default function ResultWindow({ lang }: { lang: Lang }) {
                 >
                   <dt className="text-[0.8125rem] text-muted">{b.label[lang]}</dt>
                   <dd className="relative h-[38px]">
-                    <span className="absolute top-0 right-0 font-mono text-[0.6875rem] leading-[14px] text-muted tabular-nums">
+                    <span className="absolute top-0 right-0 font-sans text-[0.6875rem] leading-[14px] text-muted tabular-nums">
                       {fmt(b.before)} → {fmt(b.after)}
                       {b.unit[lang]}
                     </span>

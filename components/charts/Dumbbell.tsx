@@ -7,7 +7,7 @@ export function num(s: string): number {
 }
 
 /**
- * 전후 비교 덤벨 — 0–100% 축 하나에 "전"(어두운 그린)과 "후"(그린)를 찍는다.
+ * 전후 비교 덤벨 — 0–100% 축 하나에 "전"(짙은 강조색)과 "후"(강조색)를 찍는다.
  * 카드 안에서 쓰는 컴팩트 변형이라 라벨·값을 위, 축을 아래 줄에 둔다.
  */
 export default function Dumbbell({
@@ -51,7 +51,7 @@ export default function Dumbbell({
                 className="absolute top-1/2 h-0.5 -translate-y-1/2 rounded bg-accent-dim"
                 style={{ left: `${lo}%`, width: `${span}%` }}
               />
-              {/* 전(어두운 그린) · 후(그린) — 겹칠 때를 대비해 배경색 링 */}
+              {/* 전(짙은 강조색) · 후(강조색) — 겹칠 때를 대비해 배경색 링 */}
               <span
                 className="absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-dim ring-2 ring-surface"
                 style={{ left: `${before}%` }}
@@ -66,7 +66,7 @@ export default function Dumbbell({
       })}
 
       {/* 축 눈금 */}
-      <div className="relative h-3 font-mono text-[10px] text-faint" aria-hidden>
+      <div className="relative h-3 font-sans text-[10px] text-faint" aria-hidden>
         <span className="absolute left-0">0</span>
         <span className="absolute left-1/2 -translate-x-1/2">50</span>
         <span className="absolute right-0">100%</span>

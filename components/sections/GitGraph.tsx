@@ -5,7 +5,7 @@ import Reveal from "@/components/ui/Reveal";
 import ModalCard from "@/components/ui/ModalCard";
 import { renderEm } from "@/components/ui/em";
 import { timeline, type TimelineItem } from "@/data/timeline";
-import { workBySlug } from "@/data/work";
+import { workBySlug, type InferenceComparison } from "@/data/work";
 import {
   getOpenSourceStats,
   groupArtifacts,
@@ -68,6 +68,89 @@ function period(item: TimelineItem): string {
   return item.end ? `${item.start} — ${item.end}` : item.start;
 }
 
+function InferenceBars({
+  comparison,
+  lang,
+}: {
+  comparison: InferenceComparison;
+  lang: Lang;
+}) {
+  const max = Math.max(...comparison.items.map((item) => item.seconds));
+  const min = Math.min(...comparison.items.map((item) => item.seconds));
+  const ratio = Math.round(max / min);
+  const maxMilliseconds = max * 1000;
+  const logWidth = (seconds: number) =>
+    `${Math.max(
+      (Math.log10(seconds * 1000) / Math.log10(maxMilliseconds)) * 100,
+      8
+    )}%`;
+
+  return (
+    <figure className="mt-4 rounded-md bg-background p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <figcaption className="text-xs font-semibold">
+          {comparison.title[lang]}
+        </figcaption>
+        <p className="text-[0.6875rem] text-faint">{comparison.note[lang]}</p>
+      </div>
+
+      <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-end gap-3">
+        <div>
+          <p className="text-[0.6875rem] text-faint">
+            {comparison.items[0].label}
+          </p>
+          <p className="mt-0.5 text-xl font-semibold tabular-nums">
+            {comparison.items[0].display[lang]}
+          </p>
+        </div>
+        <div className="pb-0.5 text-center">
+          <p className="text-faint" aria-hidden>
+            →
+          </p>
+          <p className="mt-1 whitespace-nowrap rounded-full bg-accent/10 px-2 py-1 text-[0.6875rem] font-semibold text-accent-ink">
+            {lang === "ko" ? `약 ${ratio}배 빠름` : `~${ratio}× faster`}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[0.6875rem] text-faint">
+            {comparison.items[1].label}
+          </p>
+          <p className="mt-0.5 text-xl font-semibold text-accent-ink tabular-nums">
+            {comparison.items[1].display[lang]}
+          </p>
+        </div>
+      </div>
+
+      <div
+        className="mt-5 space-y-2.5"
+        role="img"
+        aria-label={comparison.items
+          .map((item) => `${item.label} ${item.display[lang]}`)
+          .join(", ")}
+      >
+        {comparison.items.map((item, index) => (
+          <div key={item.label} className="grid grid-cols-[5.5rem_1fr] items-center gap-2.5">
+            <span className="truncate text-[0.6875rem] text-faint">
+              {item.label}
+            </span>
+            <span className="h-2 overflow-hidden rounded-full bg-line">
+              <span
+                className={`block h-full rounded-full ${
+                  index === 0 ? "bg-line-strong" : "bg-accent"
+                }`}
+                style={{ width: logWidth(item.seconds) }}
+              />
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-right text-[0.625rem] text-faint">
+        {lang === "ko" ? "막대는 로그 스케일" : "Bars use a logarithmic scale"}
+      </p>
+    </figure>
+  );
+}
+
 /** ISO 시각 → "YYYY.MM" */
 function toYearMonth(iso: string): string {
   return iso.slice(0, 7).replace("-", ".");
@@ -100,7 +183,7 @@ function BranchCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-x-2 text-xs text-faint">
-            <span className="font-mono tabular-nums">{period(item)}</span>
+            <span className="font-sans tabular-nums">{period(item)}</span>
             {item.ongoing && (
               <span className="text-accent-ink">{ui.timeline.ongoing}</span>
             )}
@@ -149,7 +232,7 @@ function BranchCard({
       )}
 
       {work && (
-        <p className="mt-2.5 font-mono text-xs text-faint">
+        <p className="mt-2.5 font-sans text-xs text-faint">
           {work.tech.join(" · ")}
         </p>
       )}
@@ -178,13 +261,15 @@ function CardDetail({
 }) {
   const work = item.workSlug ? workBySlug.get(item.workSlug) : undefined;
   const metrics = work?.study?.metrics;
+  const narrative = work?.study?.narrative?.[lang];
+  const inferenceComparison = work?.study?.inferenceComparison;
   const vram = metrics?.find((m) => m.after.includes("MB"));
   const isAward = item.kind === "award";
 
   return (
     <div>
       <p className="flex flex-wrap items-center gap-x-2 pr-8 text-xs text-faint">
-        <span className="font-mono tabular-nums">{period(item)}</span>
+        <span className="font-sans tabular-nums">{period(item)}</span>
         {item.ongoing && (
           <span className="text-accent-ink">{ui.timeline.ongoing}</span>
         )}
@@ -200,14 +285,31 @@ function CardDetail({
       <h3 className="mt-2 pr-8 text-lg font-semibold">{item.title[lang]}</h3>
       <p className="mt-0.5 text-xs text-faint">{item.org[lang]}</p>
 
-      <p className="mt-4 text-sm leading-[1.85] text-muted">
-        {renderEm(work ? work.summary[lang] : item.detail[lang])}
-      </p>
+      {narrative ? (
+        <div className="mt-4 space-y-4">
+          {narrative.map((paragraph, index) => (
+            <div key={paragraph}>
+              <p className="text-sm leading-[1.85] text-muted">
+                {renderEm(paragraph)}
+              </p>
+              {index === 1 && inferenceComparison && (
+                <InferenceBars comparison={inferenceComparison} lang={lang} />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <p className="mt-4 text-sm leading-[1.85] text-muted">
+            {renderEm(work ? work.summary[lang] : item.detail[lang])}
+          </p>
 
-      {work?.study && (
-        <p className="mt-3 text-sm leading-[1.85] text-muted">
-          {renderEm(work.study.lead[lang])}
-        </p>
+          {work?.study && (
+            <p className="mt-3 text-sm leading-[1.85] text-muted">
+              {renderEm(work.study.lead[lang])}
+            </p>
+          )}
+        </>
       )}
 
       {item.highlights && (
@@ -238,7 +340,7 @@ function CardDetail({
         />
       )}
 
-      {metrics && (
+      {metrics && !narrative && (
         <div className="mt-5 border-t border-line pt-4">
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-xs font-medium">{ui.ocr.title}</p>
@@ -266,7 +368,7 @@ function CardDetail({
       )}
 
       {work && (
-        <p className="mt-4 font-mono text-xs text-faint">
+        <p className="mt-4 font-sans text-xs text-faint">
           {work.tech.join(" · ")}
         </p>
       )}
@@ -352,7 +454,7 @@ function PlatformBranch({
         className="h-1.5 rounded-full bg-release"
         style={{ width: `${barWidth(source.downloads, max)}px` }}
       />
-      <span className="font-mono text-xs text-muted tabular-nums">
+      <span className="font-sans text-xs text-muted tabular-nums">
         {source.downloads.toLocaleString()}
       </span>
     </span>
@@ -384,7 +486,7 @@ function ReleaseRow({
       <p
         className={`flex flex-wrap items-center gap-x-2 text-xs text-faint ${justifyEnd}`}
       >
-        <span className="font-mono tabular-nums">
+        <span className="font-sans tabular-nums">
           {toYearMonth(group.createdAt)}
         </span>
         <span className="rounded-sm border border-release/60 px-1.5 py-0.5 text-release">
@@ -424,7 +526,7 @@ function ReleaseRow({
             className="h-1.5 rounded-full bg-release"
             style={{ width: `${barWidth(only.downloads, max)}px` }}
           />
-          <span className="font-mono text-xs text-muted tabular-nums">
+          <span className="font-sans text-xs text-muted tabular-nums">
             {only.downloads.toLocaleString()}
           </span>
         </p>
@@ -456,9 +558,9 @@ type Entry =
   | { type: "release"; date: string; group: ReleaseGroup };
 
 /**
- * git 그래프 타임라인 — 가운데 main 줄기를 두고 위(과거)에서 아래(현재)로
- * 내려온다. 연구·개발·수상은 브랜치 카드, 공개물은 올린 날짜 위치에 릴리즈
- * 행으로 얹히고, 맨 아래 HEAD에 누적 다운로드 합계가 붙는다.
+ * git 그래프 타임라인 — 가운데 main 줄기를 두고 위(현재)에서 아래(과거)로
+ * 내려간다. 연구·개발·수상은 브랜치 카드, 공개물은 올린 날짜 위치에 릴리즈
+ * 행으로 얹히고, 맨 위 HEAD에서 최신 기록부터 시작한다.
  * 모바일에서는 줄기가 왼쪽에 붙는다.
  */
 export default async function GitGraph({ lang }: { lang: Lang }) {
@@ -472,7 +574,7 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
     1
   );
 
-  // 내릴수록 최신 — 오래된 것부터. 같은 달이면 카드가 릴리즈보다 먼저.
+  // 내릴수록 과거 — 최신 항목부터. 같은 달이면 카드가 릴리즈보다 먼저.
   const entries: Entry[] = [
     ...timeline.map(
       (item): Entry => ({ type: "item", date: item.start, item })
@@ -484,7 +586,7 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
         group,
       })
     ),
-  ].sort((a, b) => a.date.localeCompare(b.date));
+  ].sort((a, b) => b.date.localeCompare(a.date));
 
   const rows: ReactNode[] = [];
   let prevYear = "";
@@ -499,7 +601,7 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
       noPull = true;
       rows.push(
         <li key={`year-${year}`} className="relative flex pb-8 sm:justify-center">
-          <span className="z-10 ml-4 -translate-x-1/2 bg-background px-2 py-0.5 font-mono text-xs text-faint sm:ml-0 sm:translate-x-0">
+          <span className="z-10 ml-4 -translate-x-1/2 bg-background px-2 py-0.5 font-sans text-xs text-faint sm:ml-0 sm:translate-x-0">
             {year}
           </span>
         </li>
@@ -572,17 +674,17 @@ export default async function GitGraph({ lang }: { lang: Lang }) {
       />
 
       <ol>
-        {rows}
-
         {/* HEAD — 그래프의 현재 지점 */}
-        <li className="relative pb-2">
+        <li className="relative pb-8">
           <Reveal>
             <CommitDot hollow />
-            <p className="ml-12 pt-0.5 text-xs text-accent-ink sm:ml-0 sm:text-center">
-              <span className="font-mono">HEAD</span> → {ui.timeline.present}
+            <p className="ml-12 pt-0.5 text-xs text-accent-ink sm:ml-[calc(50%+1.75rem)]">
+              <span className="font-sans">HEAD</span>
             </p>
           </Reveal>
         </li>
+
+        {rows}
       </ol>
     </section>
   );

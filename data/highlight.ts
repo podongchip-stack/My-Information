@@ -3,7 +3,7 @@ import type { L10n } from "@/lib/i18n";
 /**
  * 히어로 아래 결과 창 — 대표 성과 하나를 크게 보여준다.
  * 출처: C:\Dev\HMM (Qwen-ASR·HMM 기술문서, BANCHMARK/results/benchmark_run.log).
- * 속도 비교 대상은 생성형 Qwen3-1.7B다(14B와 직접 잰 수치 아님). note에 반드시 남길 것.
+ * 속도 비교 대상은 생성형 Qwen3-1.7B다. note에 반드시 남길 것.
  */
 export interface HighlightBar {
   label: L10n;

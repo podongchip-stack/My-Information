@@ -37,10 +37,10 @@ export const timeline: TimelineItem[] = [
       ko: "2026 AI ROOKIE 대회 — 골든링크",
       en: "2026 AI ROOKIE — GoldenLink",
     },
-    org: { ko: "6인 팀 · 문서·음성 인식 파트 담당", en: "Team of 6 · Document & voice recognition" },
+    org: { ko: "6인 팀 · feature voice 담당", en: "Team of 6 · feature voice" },
     detail: {
-      ko: "응급이송 지원 플랫폼의 온프레미스 문서 인식·통화 음성 인식 모듈을 설계·구현했습니다.",
-      en: "Designed and built the on-premise document and call-audio recognition modules for an emergency transport platform.",
+      ko: "BERT 다중과제 모델의 온디바이스 배포를 검증하고, 공식 구급활동일지 기반 17개 필드로 확장했습니다.",
+      en: "Validated a BERT multi-task model on-device, then expanded it to 17 fields based on the official ambulance activity report.",
     },
     workSlug: "goldenlink-ocr",
   },

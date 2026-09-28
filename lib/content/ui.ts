@@ -16,11 +16,13 @@ export interface UIDict {
     role: string;
     affiliation: string;
     lab: string;
-    /** 히어로 문장 — em 부분만 그린으로 강조된다 */
-    claim: { lead: string; em: string; tail: string };
     email: string;
     switchLang: string;
     theme: string;
+  };
+  capabilities: {
+    title: string;
+    items: { title: string; description: string }[];
   };
   kpi: {
     downloads: string;
@@ -68,21 +70,33 @@ const ko: UIDict = {
       "생성형 LLM이 하던 응급 통화 구조화를 직접 설계한 분류 모델로 바꿔 응답 39ms, 문서 인식 재현율 68% → 88%. 경상국립대 전자공학부 · EDCL 랩.",
     ogTitle: "김동현 — Backend Developer · AI System Engineer",
     ogDescription:
-      "14B LLM이 하던 일을, 직접 설계한 모델로 39ms에.",
+      "응급 통화 속 환자 정보를 39ms에 구조화합니다.",
   },
   hero: {
     name: "김동현",
     role: "Backend Developer · AI System Engineer",
     affiliation: "경상국립대학교 전자공학부",
     lab: "BNIT EDCL LAB",
-    claim: {
-      lead: "14B LLM이 하던 일을, 직접 설계한 모델로 ",
-      em: "39ms",
-      tail: "에.",
-    },
     email: "이메일 보내기",
     switchLang: "English로 보기",
     theme: "밝은 화면과 어두운 화면 전환",
+  },
+  capabilities: {
+    title: "Core Competencies",
+    items: [
+      {
+        title: "Backend",
+        description: "API 및 DB 설계, 데이터 파이프라인 구축",
+      },
+      {
+        title: "AI System",
+        description: "BERT, LLM, STT 모델을 활용한 시스템 개발",
+      },
+      {
+        title: "Optimization",
+        description: "추론 속도 개선과 메모리 절감을 위한 모델 경량화",
+      },
+    ],
   },
   kpi: {
     downloads: "오픈소스 누적 다운로드",
@@ -129,7 +143,7 @@ const en: UIDict = {
       "Replaced a generative LLM in emergency-call structuring with a classifier I designed, answering in 39 ms; lifted document recognition recall from 68% to 88%. Gyeongsang National University, EDCL Lab.",
     ogTitle: "Donghyeon Kim — Backend Developer · AI System Engineer",
     ogDescription:
-      "The job a 14B LLM did, done by a model I designed in 39 ms.",
+      "Emergency-call patient information, structured in 39 ms.",
   },
   hero: {
     name: "Donghyeon Kim",
@@ -137,14 +151,26 @@ const en: UIDict = {
     affiliation:
       "Dept. of Electronic Engineering, Gyeongsang National University",
     lab: "BNIT EDCL LAB",
-    claim: {
-      lead: "The job a 14B LLM did, done by a model I designed in ",
-      em: "39 ms",
-      tail: ".",
-    },
     email: "Email me",
     switchLang: "한국어로 보기",
     theme: "Switch between light and dark",
+  },
+  capabilities: {
+    title: "Core Competencies",
+    items: [
+      {
+        title: "Backend",
+        description: "API and database design, data pipeline development",
+      },
+      {
+        title: "AI System",
+        description: "Systems built with BERT, LLM, and STT models",
+      },
+      {
+        title: "Optimization",
+        description: "Model optimization for faster inference and lower memory use",
+      },
+    ],
   },
   kpi: {
     downloads: "Open-source downloads",

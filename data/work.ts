@@ -10,9 +10,18 @@ export interface Metric {
   note?: L10n;
 }
 
+export interface InferenceComparison {
+  title: L10n;
+  note: L10n;
+  items: { label: string; seconds: number; display: L10n }[];
+}
+
 export interface CaseStudy {
   /** 상세 페이지 최상단 한 문단 */
   lead: L10n;
+  /** 카드 상세에 문단 단위로 보여줄 프로젝트 서술 */
+  narrative?: L10n<string[]>;
+  inferenceComparison?: InferenceComparison;
   problem: L10n<string[]>;
   /** 팀 프로젝트에서 내가 실제로 맡은 범위 — 팀 성과와 섞어 쓰지 않는다 */
   role: L10n<string[]>;
@@ -43,12 +52,12 @@ export const work: WorkItem[] = [
   {
     slug: "goldenlink-ocr",
     title: {
-      ko: "골든링크 — 서류 인식 · 통화 음성 인식 파이프라인",
-      en: "GoldenLink — Document & Call-Audio Recognition Pipelines",
+      ko: "AIRookie / feature voice — 응급 통화 환자 정보 구조화",
+      en: "AIRookie / feature voice — Emergency Call Information Extraction",
     },
     summary: {
-      ko: "응급이송 지원 플랫폼의 문서 인식·통화 음성 인식 모듈. 문서는 영역별 라우팅으로 재현율 68% → 88%(VRAM 1/4), 통화는 정확 일치 사전으로 오교정 없이 STT를 보정.",
-      en: "Document and call-audio recognition modules for an emergency transport platform. Region-level routing lifted document recall from 68% to 88% at a quarter of the VRAM; call transcripts are corrected with an exact-match dictionary that can't mis-correct by construction.",
+      ko: "119 응급 신고와 구급대-응급실 통화에서 환자 정보를 구조화하는 **BERT 다중과제 모델**. 온디바이스 배포를 검증하고, 공식 구급활동일지 기반 **17개 필드**로 확장했습니다.",
+      en: "A **BERT multi-task model** that structures patient information from 119 emergency and paramedic-to-ER calls. I validated it on-device, then expanded it to **17 fields** based on the official ambulance activity report.",
     },
     period: "2026.07",
     ongoing: true,
@@ -56,28 +65,57 @@ export const work: WorkItem[] = [
     team: 6,
     tech: [
       "Python",
-      "ONNX Runtime",
-      "PaddleOCR-VL",
-      "DocLayout-YOLO",
-      "faster-whisper",
-      "Ollama · Qwen3",
-      "Hugging Face",
+      "klue/roberta-large",
+      "BERT Multi-task",
+      "Qwen3-14B",
+      "ASR",
+      "Raspberry Pi 4B",
     ],
     links: [
-      {
-        label: "GitHub (OCR)",
-        href: "https://github.com/podongchip-stack/AIRookie/tree/feature/info/ocr",
-      },
       {
         label: "GitHub (Voice)",
         href: "https://github.com/podongchip-stack/AIRookie/tree/feature/voice/voice",
       },
-      {
-        label: "Hugging Face",
-        href: "https://huggingface.co/podongchip/DocLayout-YOLO-DocStructBench-ONNX",
-      },
     ],
     study: {
+      inferenceComparison: {
+        title: {
+          ko: "구조화 추론 시간",
+          en: "Structuring inference time",
+        },
+        note: {
+          ko: "RTX 5080 · 동일한 STT 원문 입력",
+          en: "RTX 5080 · same raw STT transcript",
+        },
+        items: [
+          {
+            label: "Qwen3-14B (4-bit)",
+            seconds: 9.7,
+            display: { ko: "9.7초", en: "9.7 s" },
+          },
+          {
+            label: "BERT Multi-task",
+            seconds: 0.07,
+            display: { ko: "0.07초", en: "0.07 s" },
+          },
+        ],
+      },
+      narrative: {
+        ko: [
+          "AIRookie의 feature voice에서 119 응급 신고와 구급대-응급실 통화 텍스트로부터 환자 정보를 구조화해 추출하는 AI 모델을 개발했습니다. 초기에는 **Qwen3-14B 4비트 양자화 모델**로 여러 환자 정보 필드를 하나의 JSON으로 직접 생성했지만, 이후 klue/roberta-large 기반의 **BERT 다중과제 모델**을 직접 학습해 최종 채택했습니다.",
+          "최종 배포 목표는 라즈베리파이와 같은 저사양 온디바이스 환경이었습니다. 14B급 LLM은 약 355M 파라미터의 RoBERTa-large보다 **약 40배 커서** 목표 장치에 배포하기 어려웠습니다. **RTX 5080**에서 동일한 STT 원문을 입력했을 때 추론 시간은 **Qwen3-14B 4비트 양자화 모델 9.7초**, **BERT 다중과제 모델 0.07초**였습니다. LLM은 다수 필드를 하나의 JSON으로 생성하며 형식 이탈과 파싱 실패가 발생했지만, BERT 다중과제 모델은 필드별 헤드가 값을 직접 예측해 **항상 고정된 형식**으로 결과를 반환했습니다.",
+          "BERT 다중과제 모델의 스키마는 **119 구급활동일지 공식 서식**을 기준으로 17개 필드로 확장했습니다. call_type, ktas_level, ktas_evidence, chief_complaint, suspected_diagnosis, vitals, consciousness, symptoms, onset, incidents, disease_category, injuries, treatments, age, sex, medications, notes를 각각의 헤드에서 동시에 예측합니다. 분류 체계를 임의로 만들지 않고 **Pre-KTAS 1~5등급**과 공식 증상 표준명 등 기존 의료 표준을 적용했습니다.",
+          "17개 필드 BERT 다중과제 모델은 **라즈베리파이 4B와 8GB RAM** 환경에서 온디바이스 구동을 확인했습니다. 첫 호출의 콜드 스타트를 제외한 추론 시간은 **약 1.5~1.9초**, 모델 로딩은 **약 13초**였습니다. ASR을 포함한 전체 파이프라인도 온디바이스로 구성해 서버에 의존하지 않고 실시간으로 처리할 수 있음을 확인했습니다.",
+          "이 프로젝트를 통해 **모델의 크기나 최신성보다 배포 환경과 태스크에 맞는 아키텍처 선택이 중요하다**는 점을 배웠습니다. 자유 생성 방식의 LLM은 유연하지만, 17개 필드를 동시에 추출하는 고정 스키마 작업에서는 출력 형식의 불안정성이 비용이 될 수 있습니다. 이후에는 온디바이스 실행, 실시간성, 출력 형식을 먼저 정의하고 적합한 모델을 역산해 선택하며, 결과 스키마도 기존 공식 서식과 의료 표준을 우선해 설계하고 있습니다.",
+        ],
+        en: [
+          "For AIRookie's feature voice, I developed an AI model that extracts structured patient information from 119 emergency and paramedic-to-ER call transcripts. I first generated multiple patient-information fields as a single JSON object with a **4-bit quantized Qwen3-14B model**, then trained and adopted a **BERT multi-task model** based on klue/roberta-large.",
+          "The target deployment was a low-resource on-device environment such as a Raspberry Pi. The 14B-parameter LLM was **roughly 40 times larger** than RoBERTa-large at about 355M parameters. On an **RTX 5080** with the same raw STT transcript, inference took **9.7 seconds with the 4-bit quantized Qwen3-14B model** and **0.07 seconds with the BERT multi-task model**. The LLM could also deviate from the JSON schema or fail to parse, while dedicated field heads let the BERT model **always return a fixed structure**.",
+          "I expanded the BERT multi-task model to 17 fields based on the **official 119 ambulance activity report**: call_type, ktas_level, ktas_evidence, chief_complaint, suspected_diagnosis, vitals, consciousness, symptoms, onset, incidents, disease_category, injuries, treatments, age, sex, medications, and notes. Rather than inventing categories, I followed existing medical standards such as **Pre-KTAS levels 1–5** and official symptom terminology.",
+          "I verified the 17-field BERT multi-task model on a **Raspberry Pi 4B with 8GB of RAM**. Excluding the first-call cold start, inference took **about 1.5–1.9 seconds** and model loading took **about 13 seconds**. I also assembled the full pipeline, including ASR, on-device and confirmed that it could process calls in real time without depending on a server.",
+          "This project showed me that **choosing an architecture suited to the deployment environment and task matters more than model size or novelty**. Free-form LLM generation is flexible, but its output instability becomes a cost when extracting 17 fields into a fixed schema. I now define on-device execution, latency, and output format first, work backward to select the model, and prioritize official forms and medical standards when designing the output schema.",
+        ],
+      },
       lead: {
         ko: "2026 AI ROOKIE 대회 출품작 '골든링크'는 응급이송 과정의 정보를 자동으로 구조화해 병원 수용 판단을 돕는 플랫폼입니다. 저는 6인 팀에서 두 갈래를 맡았습니다 — 병원 서류 이미지를 텍스트·필드로 바꾸는 온프레미스 OCR 모듈(feature/info)과, 구급대-병원 통화를 받아써 오인식을 보정하고 SBAR로 구조화하는 음성 파이프라인(feature/voice)입니다.",
         en: "GoldenLink, our entry for the 2026 AI ROOKIE competition, structures information during emergency transport so hospitals can decide faster. On a team of six I owned two tracks: the on-premise OCR module (feature/info) that turns hospital document images into text and fields, and the voice pipeline (feature/voice) that transcribes ambulance-to-hospital calls, corrects misrecognitions, and structures them as SBAR.",
@@ -229,7 +267,12 @@ export const work: WorkItem[] = [
     ongoing: true,
     kind: "research",
     tech: ["LSTM", "Transformer", "Ansys", "MATLAB"],
-    links: [{ label: "EDCL Lab", href: "https://edcl-page.vercel.app/" }],
+    links: [
+      {
+        label: "EDCL Lab",
+        href: "https://play-ground-attendance.vercel.app/",
+      },
+    ],
   },
   {
     slug: "stock-agent",

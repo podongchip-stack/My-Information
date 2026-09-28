@@ -57,7 +57,7 @@ export default async function Stats({ lang }: { lang: Lang }) {
     >
       {items.map((it) => (
         <div key={it.label} className="flex flex-col border-b border-line py-5">
-          <dd className="order-1 font-mono text-[clamp(1.625rem,5vw,2.125rem)] font-semibold tracking-tight tabular-nums">
+          <dd className="order-1 font-sans text-[clamp(1.625rem,5vw,2.125rem)] font-semibold tracking-tight tabular-nums">
             {it.value}
           </dd>
           <dt className="order-2 text-[0.8125rem] text-muted">{it.label}</dt>

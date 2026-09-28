@@ -4,7 +4,7 @@ import { LANGS, LANG_LABEL, type Lang } from "@/lib/i18n";
 import { getUI } from "@/lib/content/ui";
 import { EMAIL, SOCIALS } from "@/lib/links";
 
-const LAB_URL = "https://edcl-page.vercel.app/";
+const LAB_URL = "https://play-ground-attendance.vercel.app/";
 
 /** 히어로 옆에 바로 두는 링크 — 나머지 채널은 푸터에 모은다 */
 const HERO_LINKS = SOCIALS.filter((s) =>
@@ -14,7 +14,7 @@ const HERO_LINKS = SOCIALS.filter((s) =>
 const chip =
   "inline-flex min-h-11 items-center rounded-md border border-line px-4 text-sm text-muted transition-colors hover:border-accent hover:text-foreground";
 
-/** 상단 바(이름·역할, 테마·언어 전환) + 한 문장 소개 */
+/** 상단 바(이름·역할, 테마·언어 전환) + 소속·연락 링크 */
 export default function Hero({ lang }: { lang: Lang }) {
   const ui = getUI(lang);
   const other = LANGS.find((l) => l !== lang)!;
@@ -41,13 +41,7 @@ export default function Hero({ lang }: { lang: Lang }) {
       </header>
 
       <section className="pt-14 pb-10 md:pt-24 md:pb-14">
-        <h1 className="max-w-[16em] text-[clamp(1.875rem,6vw,3.5rem)] leading-[1.15] font-bold tracking-tight text-balance">
-          {ui.hero.claim.lead}
-          <em className="text-accent-ink not-italic">{ui.hero.claim.em}</em>
-          {ui.hero.claim.tail}
-        </h1>
-
-        <p className="mt-5 text-[0.9375rem] text-muted">
+        <p className="text-[0.9375rem] text-muted">
           {ui.hero.affiliation}
           <span aria-hidden> · </span>
           <a
