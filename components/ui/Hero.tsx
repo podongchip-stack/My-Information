@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NeuralCircuit from "@/components/ui/NeuralCircuit";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { LANGS, LANG_LABEL, type Lang } from "@/lib/i18n";
 import { getUI } from "@/lib/content/ui";
@@ -40,7 +41,9 @@ export default function Hero({ lang }: { lang: Lang }) {
         </div>
       </header>
 
-      <section className="pt-14 pb-10 md:pt-24 md:pb-14">
+      <NeuralCircuit className="mt-4 h-[320px] md:mt-8 md:h-[460px]" />
+
+      <section className="pt-6 pb-10 md:pt-10 md:pb-14">
         <p className="text-[0.9375rem] text-muted">
           {ui.hero.affiliation}
           <span aria-hidden> · </span>
